@@ -9,7 +9,6 @@ namespace Catalog.Persistence.Extensions;
 
  public static class HostingExtensions
     {
-        // IHost üzerinde migrate + (opsiyonel) seed
         public static async Task MigrateDevAndSeedAsync<TContext>(
             this IHost host,
             Func<TContext, IServiceProvider, Task>? devSeed = null)

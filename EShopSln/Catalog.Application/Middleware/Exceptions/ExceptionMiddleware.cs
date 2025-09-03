@@ -1,6 +1,7 @@
 using EShop.Shared.Dtos.BasesResponses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Serilog.Context;
 using ValidationException = FluentValidation.ValidationException;
 
@@ -35,11 +36,9 @@ namespace Catalog.Application.Middleware.Exceptions;
 
         private static Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
         {
-            int statusCode = GetStatusCode(exception);
-
             var code = exception is ValidationException
                 ? StatusCodes.Status400BadRequest
-                : statusCode;
+                : StatusCodes.Status500InternalServerError;
 
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = code;
@@ -48,18 +47,9 @@ namespace Catalog.Application.Middleware.Exceptions;
                 ? vEx.Errors.Select(e => e.ErrorMessage).ToList()
                 : new List<string> { exception.Message };
 
-            var payload = new ExceptionModel
-            {
-                Response = new ResponseDto<ExceptionModel>()
-                    .Fail(new ExceptionModel(), errors, code)
-            };
+            var response = new ResponseDto<object>()
+                .Fail(null, errors, code);
 
-            return httpContext.Response.WriteAsync(payload.ToString());
+            return httpContext.Response.WriteAsync(JsonConvert.SerializeObject(response));
         }
-        private static int GetStatusCode(Exception exception) =>
-            exception switch
-            {
-                ValidationException => StatusCodes.Status422UnprocessableEntity,
-                _ => StatusCodes.Status500InternalServerError
-            };
     }

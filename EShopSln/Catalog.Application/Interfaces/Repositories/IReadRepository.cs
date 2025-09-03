@@ -6,11 +6,13 @@ namespace Catalog.Application.Interfaces.Repositories;
 
 public interface IReadRepository<T> where T : class, IBaseEntity, new()
 {
-    Task<IList<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,
+    Task<IList<T>> GetAllAsync(
+        Expression<Func<T, bool>>? predicate = null,
         Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-        Expression<Func<T,T>>? selector = null,
-        bool enableTracking = false);
+        Expression<Func<T, T>>? selector = null,
+        bool enableTracking = false,
+        CancellationToken ct = default);
 
     Task<IList<T>> GetAllByPagingAsync(Expression<Func<T, bool>>? predicate = null,
         Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,

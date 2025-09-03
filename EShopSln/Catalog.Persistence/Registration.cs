@@ -1,3 +1,4 @@
+using Catalog.Application.Interfaces.Mapping;
 using Catalog.Application.Interfaces.Repositories;
 using Catalog.Application.Interfaces.UnitOfWorks;
 using Catalog.Persistence.Concrete.Repositories;
@@ -19,8 +20,10 @@ public static class Registration
         services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
         services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
 
-       
+        services.AddSingleton<Catalog.Application.Interfaces.Mapping.IMapper, Mapper>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
     }
 }

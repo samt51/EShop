@@ -20,21 +20,32 @@ namespace Catalog.Persistence.Concrete.Repositories;
 
 
 
-        public async Task<IList<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, Expression<Func<T, T>>? selector = null, bool enableTracking = false)
+        public async Task<IList<T>> GetAllAsync(
+            Expression<Func<T, bool>>? predicate = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            Expression<Func<T, T>>? selector = null,
+            bool enableTracking = false,
+            CancellationToken ct = default)
         {
-            IQueryable<T> queryable = Table;
-            if (!enableTracking) queryable = queryable.AsNoTracking();
-            if (include is not null) queryable = include(queryable);
-            if (predicate is not null) queryable = queryable.Where(predicate);
-            if (orderBy is not null)
-                return await orderBy(queryable).ToListAsync();
+            IQueryable<T> query = Table;
+
+            if (!enableTracking)
+                query = query.AsNoTracking();
+
+            if (predicate is not null)
+                query = query.Where(predicate);
+
+            if (include is not null)
+                query = include(query);
 
             if (selector is not null)
-            {
-                return await queryable.Select(selector).ToListAsync();
-            }
+                query = query.Select(selector);
 
-            return await queryable.ToListAsync();
+            if (orderBy is not null)
+                query = orderBy(query);
+
+            return await query.ToListAsync(ct); // <-- tek seferde materyalize
         }
 
         public async Task<IList<T>> GetAllByPagingAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, bool enableTracking = false, int currentPage = 1, int pageSize = 3)
