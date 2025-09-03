@@ -15,14 +15,13 @@ public class WriteRepository<T> : IWriteRepository<T> where T : class, IBaseEnti
 
     private DbSet<T> Table { get => dbContext.Set<T>(); }
 
-    public async Task<T> AddAsync(T entity)
+    public async Task<T> AddAsync(T entity,CancellationToken cancellationToken = default)
     {
-
-        var tab = await Table.AddAsync(entity).ConfigureAwait(false);
+        var tab = await Table.AddAsync(entity);
         return tab.Entity;
-
-
     }
+
+    
 
     public async Task AddRangeAsync(IList<T> entities)
     {

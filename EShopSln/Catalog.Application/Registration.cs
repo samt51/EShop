@@ -12,7 +12,10 @@ namespace Catalog.Application;
 
             services.AddTransient<ExceptionMiddleware>();
             
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+            
             return services;
 
         }
+        
     }

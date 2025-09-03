@@ -1,5 +1,4 @@
-using System.Net.Mime;
-using System.Text.Json;
+
 using Catalog.Application;
 using Catalog.Application.Middleware.Exceptions;
 using Catalog.Persistence;
@@ -11,6 +10,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Taranacak assembly'leri belirle
+var mapperAssemblies = new[]
+{
+    typeof(Catalog.Persistence.Concrete.Repositories.CatalogProfile).Assembly,
+    typeof(Program).Assembly
+};
+
+// Overload: (Action<IMapperConfigurationExpression>, params Assembly[])
+builder.Services.AddAutoMapper(cfg => { /* opsiyonel global ayarlar */ }, mapperAssemblies);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplication();
@@ -42,6 +52,7 @@ if (app.Environment.IsDevelopment())
 // Health endpoints (mapping Program.cs’te)
 app.MapHealthChecks("/health/live",  new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready"); // AddNpgSql kayıtlıysa ready çalışır
+
 app.ConfigureExceptionHandlingMiddleware();
 app.UseHttpsRedirection();
 app.MapControllers();

@@ -12,4 +12,9 @@ public class Category : BaseEntity
         this.Id = id;
         this.Name = name;
     }
+
+    public Category()
+    {
+      
+    }
 }
