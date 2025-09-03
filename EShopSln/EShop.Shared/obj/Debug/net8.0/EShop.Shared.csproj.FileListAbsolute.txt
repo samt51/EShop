@@ -9,3 +9,4 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/obj/Debug/net8.0/refint/EShop.Shared.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/obj/Debug/net8.0/EShop.Shared.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/obj/Debug/net8.0/ref/EShop.Shared.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/obj/Debug/net8.0/EShop.Shared.sourcelink.json
