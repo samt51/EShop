@@ -18,3 +18,5 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Persistence/obj/Debug/net8.0/Catalog.Persistence.sourcelink.json
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Persistence/bin/Debug/net8.0/Catalog.Domain.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Persistence/bin/Debug/net8.0/Catalog.Domain.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Persistence/bin/Debug/net8.0/Catalog.Persistence.runtimeconfig.json
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Persistence/obj/Debug/net8.0/Catalog.Persistence.genruntimeconfig.cache
