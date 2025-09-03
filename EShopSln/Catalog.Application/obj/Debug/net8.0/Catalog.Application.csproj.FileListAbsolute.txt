@@ -13,3 +13,4 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Application/obj/Debug/net8.0/refint/Catalog.Application.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Application/obj/Debug/net8.0/Catalog.Application.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Application/obj/Debug/net8.0/ref/Catalog.Application.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Application/obj/Debug/net8.0/Catalog.Application.sourcelink.json
