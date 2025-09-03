@@ -9,6 +9,10 @@ public class AppDbContext : DbContext
     {
 
     }
+    protected override void OnModelCreating(ModelBuilder b)
+    {
+        b.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    }
 
     public DbSet<Product> Product { get; set; }
     public DbSet<Category> Category { get; set; }
