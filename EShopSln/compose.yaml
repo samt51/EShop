@@ -4,3 +4,9 @@
     build:
       context: .
       dockerfile: Order.Api/Dockerfile
+
+  payment.api:
+    image: payment.api
+    build:
+      context: .
+      dockerfile: Payment.Api/Dockerfile
