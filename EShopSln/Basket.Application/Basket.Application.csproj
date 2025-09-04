@@ -8,13 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Bases\" />
-      <Folder Include="Dtos\BasketDtos\" />
-      <Folder Include="Dtos\BasketItemsDtos\" />
-      <Folder Include="Features\" />
+      <Folder Include="Features\BasketFeature\Commands\" />
+      <Folder Include="Features\BasketFeature\Validator\" />
+      <Folder Include="Features\BasketItemFeature\Queries\" />
+      <Folder Include="Features\BasketItemFeature\Validator\" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Basket.Domain\Basket.Domain.csproj" />
+      <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\EShop.Shared\EShop.Shared.csproj" />
     </ItemGroup>
 

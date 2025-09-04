@@ -2,8 +2,6 @@ using System.Diagnostics;
 using Basket.Application;
 using Basket.Application.Middleware.Exceptions;
 using Basket.Persistence;
-using Basket.Persistence.Context;
-using Basket.Persistence.Extensions;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Serilog.Context;
@@ -90,13 +88,6 @@ app.UseSwaggerUI(o =>
     o.RoutePrefix = "swagger";
 });
 
-
-await app.MigrateDevAndSeedAsync<AppDbContext>(async (db, sp) =>
-{
-    await HostingExtensions.DevSeeder.SeedAsync(db);
-});
-
-
 app.UseSerilogRequestLogging(opts =>
 {
     opts.EnrichDiagnosticContext = (diag, http) =>
@@ -115,7 +106,7 @@ app.MapHealthChecks("/health/ready");
 
 app.ConfigureExceptionHandlingMiddleware();
 
- app.UseHttpsRedirection(); 
+app.UseHttpsRedirection(); 
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -132,6 +123,5 @@ app.Use(async (context, next) =>
         await next();
     }
 });
-app.UseOutputCache();
 app.MapControllers();
 app.Run();
