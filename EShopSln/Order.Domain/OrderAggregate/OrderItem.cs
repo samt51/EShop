@@ -2,9 +2,9 @@ using Order.Domain.Core;
 
 namespace Order.Domain.OrderAggregate;
 
-public class OrderItem : Entity
+public class OrderItem : AuditableEntity
 {
-    public string ProductId { get; private set; }
+    public int ProductId { get; private set; }
     public string ProductName { get; private set; }
     public string PictureUrl { get; private set; }
     public Decimal Price { get; private set; }
@@ -15,13 +15,31 @@ public class OrderItem : Entity
     public OrderItem()
     {
     }
-
-    public OrderItem(string productId, string productName, string pictureUrl, decimal price)
+    public OrderItem(int productId, string productName, string pictureUrl, decimal price)
     {
         ProductId = productId;
         ProductName = productName;
         PictureUrl = pictureUrl;
         Price = price;
+    }
+    
+    public OrderItem(int productId, string productName, string pictureUrl, decimal price,int orderId)
+    {
+        ProductId = productId;
+        ProductName = productName;
+        PictureUrl = pictureUrl;
+        Price = price;
+        OrderId = orderId;
+    }
+
+    public OrderItem(int id,int productId, string productName, string pictureUrl, decimal price,int orderId)
+    {
+        ProductId = productId;
+        ProductName = productName;
+        PictureUrl = pictureUrl;
+        Price = price;
+        OrderId = orderId;
+        Id = id;
     }
 
     public void UpdateOrderItem(string productName, string pictureUrl, decimal price)

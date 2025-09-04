@@ -2,7 +2,7 @@ using Order.Domain.Core;
 
 namespace Order.Domain.OrderAggregate;
 
-public class Order : Entity, IAggregateRoot
+public class Order : AuditableEntity, IAggregateRoot
 {
     public DateTime CreatedDate { get; private set; }
 
@@ -17,7 +17,6 @@ public class Order : Entity, IAggregateRoot
     public Order()
     {
     }
-
     public Order(int buyerId, Address address)
     {
         _orderItems = new List<OrderItem>();
@@ -25,15 +24,29 @@ public class Order : Entity, IAggregateRoot
         BuyerId = buyerId;
         Address = address;
     }
+    public Order(int id,int buyerId, Address address)
+    {
+        Id = id;
+        _orderItems = new List<OrderItem>();
+        CreatedDate = DateTime.Now;
+        BuyerId = buyerId;
+        Address = address;
+    }
+    public Order(int buyerId, Address address,List<OrderItem> orderItems)
+    {
+        _orderItems = orderItems;
+        CreatedDate = DateTime.Now;
+        BuyerId = buyerId;
+        Address = address;
+    }
 
-    public void AddOrderItem(string productId, string productName, decimal price, string pictureUrl)
+    public void AddOrderItem(int productId, string productName, decimal price, string pictureUrl)
     {
         var existProduct = _orderItems.Any(x => x.ProductId == productId);
 
         if (!existProduct)
         {
             var newOrderItem = new OrderItem(productId, productName, pictureUrl, price);
-
             _orderItems.Add(newOrderItem);
         }
     }

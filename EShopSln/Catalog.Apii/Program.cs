@@ -86,6 +86,7 @@ builder.Services.AddSwaggerGen(o =>
 });
 
 
+
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddApplication();

@@ -1,0 +1,12 @@
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/bin/Debug/net8.0/Order.Domain.Core.deps.json
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/bin/Debug/net8.0/Order.Domain.Core.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/bin/Debug/net8.0/Order.Domain.Core.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/Order.Domain.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/Order.Domain.Core.AssemblyInfoInputs.cache
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/Order.Domain.Core.AssemblyInfo.cs
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/Order.Domain.Core.csproj.CoreCompileInputs.cache
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/Order.Domain.Core.sourcelink.json
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/Order.Domain.Core.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/refint/Order.Domain.Core.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/Order.Domain.Core.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/obj/Debug/net8.0/ref/Order.Domain.Core.dll
