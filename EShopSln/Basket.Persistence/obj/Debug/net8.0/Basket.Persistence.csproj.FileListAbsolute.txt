@@ -18,3 +18,11 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/obj/Debug/net8.0/refint/Basket.Persistence.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/obj/Debug/net8.0/Basket.Persistence.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/obj/Debug/net8.0/ref/Basket.Persistence.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Application.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Domain.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Microsoft.AspNetCore.OutputCaching.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Microsoft.Net.Http.Headers.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Microsoft.Extensions.ObjectPool.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Microsoft.Extensions.Features.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Application.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Domain.pdb

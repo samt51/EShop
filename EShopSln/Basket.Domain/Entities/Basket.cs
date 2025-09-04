@@ -4,10 +4,10 @@ namespace Basket.Domain.Entities;
 
 public class Basket : BaseEntity  
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public List<BasketItem> basketItems { get; set; }
 
-    public Basket(int id,int userId, List<BasketItem> basketItems)
+    public Basket(int id,string userId, List<BasketItem> basketItems)
     {
         this.Id = id;
         this.UserId = userId;

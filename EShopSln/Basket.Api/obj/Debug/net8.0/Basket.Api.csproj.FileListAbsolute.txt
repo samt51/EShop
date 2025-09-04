@@ -79,3 +79,9 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Serilog.Sinks.PeriodicBatching.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Serilog.Sinks.PostgreSQL.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/System.Diagnostics.DiagnosticSource.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Pipelines.Sockets.Unofficial.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/StackExchange.Redis.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Catalog.Application.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Catalog.Domain.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Catalog.Application.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Catalog.Domain.pdb
