@@ -8,6 +8,9 @@ public class OrderItem : Entity
     public string ProductName { get; private set; }
     public string PictureUrl { get; private set; }
     public Decimal Price { get; private set; }
+    
+    public int OrderId { get; set; }
+    public Order Order { get; set; }
 
     public OrderItem()
     {

@@ -8,7 +8,7 @@ public class Order : Entity, IAggregateRoot
 
     public Address Address { get; private set; }
 
-    public string BuyerId { get; private set; }
+    public int BuyerId { get; private set; }
 
     private readonly List<OrderItem> _orderItems;
 
@@ -18,7 +18,7 @@ public class Order : Entity, IAggregateRoot
     {
     }
 
-    public Order(string buyerId, Address address)
+    public Order(int buyerId, Address address)
     {
         _orderItems = new List<OrderItem>();
         CreatedDate = DateTime.Now;
