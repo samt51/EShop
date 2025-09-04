@@ -6,7 +6,7 @@ namespace Order.Application.Features.OrderFeature.Commands.CreateOrder;
 
 public class CreateOrderCommandRequest:  IRequest<ResponseDto<CreateOrderCommandResponse>>
 {
-    public string BuyerId { get; set; }
+    public int BuyerId { get; set; }
 
     public List<OrderItemDto> OrderItems { get; set; }
 
