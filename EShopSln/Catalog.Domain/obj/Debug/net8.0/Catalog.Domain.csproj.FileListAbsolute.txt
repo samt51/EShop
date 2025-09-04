@@ -8,9 +8,9 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog.Domain.AssemblyInfoInputs.cache
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog.Domain.AssemblyInfo.cs
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog.Domain.csproj.CoreCompileInputs.cache
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog.Domain.sourcelink.json
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog..A0AFAC00.Up2Date
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog.Domain.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/refint/Catalog.Domain.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog.Domain.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/ref/Catalog.Domain.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/obj/Debug/net8.0/Catalog.Domain.sourcelink.json

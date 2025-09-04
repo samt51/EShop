@@ -1364,6 +1364,9 @@
         }
       },
       "EShop.Shared/1.0.0": {
+        "dependencies": {
+          "AutoMapper": "15.0.1"
+        },
         "runtime": {
           "EShop.Shared.dll": {
             "assemblyVersion": "1.0.0",

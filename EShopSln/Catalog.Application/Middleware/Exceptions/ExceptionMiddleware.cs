@@ -1,55 +1,62 @@
-using EShop.Shared.Dtos.BasesResponses;
+using System.Text.Json;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Serilog.Context;
-using ValidationException = FluentValidation.ValidationException;
 
-namespace Catalog.Application.Middleware.Exceptions;
-
-   public class ExceptionMiddleware : IMiddleware
+namespace Catalog.Application.Middleware.Exceptions
+{
+    public class ExceptionMiddleware : IMiddleware
     {
+        private static readonly JsonSerializerOptions JsonOpt = new(JsonSerializerDefaults.Web);
+
         private readonly ILogger<ExceptionMiddleware> _logger;
+        public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger) => _logger = logger;
 
-        public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger)
-        {
-            _logger = logger;
-        }
-
-        public async Task InvokeAsync(HttpContext httpContext, RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             try
             {
-                await next(httpContext);
+                await next(context);
             }
             catch (Exception ex)
             {
-                var context = httpContext.User?.Identity?.IsAuthenticated != null || true ? httpContext.User.Identities.Select(x => x.FindFirst("Id"))?.FirstOrDefault() : null;
-                if (context is not null)
-                {
-                    LogContext.PushProperty("UserId", context.Value.ToString());
-                }
-                _logger.Log(LogLevel.Error, ex.Message);
-                await HandleExceptionAsync(httpContext, ex);
+                var userId = context.User?.FindFirst("Id")?.Value ?? "-";
+                using (_logger.BeginScope(new Dictionary<string, object> { ["UserId"] = userId }))
+                    _logger.LogError(ex, "Unhandled exception");
+
+                await HandleExceptionAsync(context, ex);
             }
         }
 
         private static Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
         {
-            var code = exception is ValidationException
-                ? StatusCodes.Status400BadRequest
+            var statusCode = exception is ValidationException
+                ? StatusCodes.Status422UnprocessableEntity
                 : StatusCodes.Status500InternalServerError;
 
-            httpContext.Response.ContentType = "application/json";
-            httpContext.Response.StatusCode = code;
+            httpContext.Response.StatusCode = statusCode;
+            httpContext.Response.ContentType = "application/json; charset=utf-8";
 
-            var errors = exception is ValidationException vEx
-                ? vEx.Errors.Select(e => e.ErrorMessage).ToList()
-                : new List<string> { exception.Message };
+            if (exception is ValidationException vex)
+            {
+                var payload = new
+                {
+                    statusCode = StatusCodes.Status400BadRequest,
+                    isSuccess  = false,
+                    errors     = vex.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+                var json = JsonSerializer.Serialize(payload, JsonOpt);
+                return httpContext.Response.WriteAsync(json);
+            }
 
-            var response = new ResponseDto<object>()
-                .Fail(null, errors, code);
-
-            return httpContext.Response.WriteAsync(JsonConvert.SerializeObject(response));
+            var generic = new
+            {
+                statusCode,
+                isSuccess = false,
+                errors    = new[] { "Internal Server Error" }
+            };
+            var genericJson = JsonSerializer.Serialize(generic, JsonOpt);
+            return httpContext.Response.WriteAsync(genericJson);
         }
     }
+}
