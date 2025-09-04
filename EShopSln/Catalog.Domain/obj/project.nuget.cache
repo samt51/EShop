@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "OMd9kbQCv84=",
+  "dgSpecHash": "SOfgzl5VJF0=",
   "success": true,
   "projectFilePath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Domain/Catalog.Domain.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/sametbaglan/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512"
+  ],
   "logs": []
 }
