@@ -1,0 +1,12 @@
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/bin/Debug/net8.0/Basket.Infrastructure.deps.json
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/bin/Debug/net8.0/Basket.Infrastructure.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/bin/Debug/net8.0/Basket.Infrastructure.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/Basket.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/Basket.Infrastructure.AssemblyInfoInputs.cache
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/Basket.Infrastructure.AssemblyInfo.cs
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/Basket.Infrastructure.csproj.CoreCompileInputs.cache
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/Basket.Infrastructure.sourcelink.json
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/Basket.Infrastructure.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/refint/Basket.Infrastructure.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/Basket.Infrastructure.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Infrastructure/obj/Debug/net8.0/ref/Basket.Infrastructure.dll
