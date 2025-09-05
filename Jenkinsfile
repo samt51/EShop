@@ -15,9 +15,6 @@ pipeline {
 
   stages {
 
-    stage('Checkout') {
-      steps { checkout scm }
-    }
 
     stage('Dotnet Restore & Build') {
       steps {
