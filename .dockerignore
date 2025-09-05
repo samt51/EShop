@@ -1,0 +1,14 @@
+.git
+**/bin/
+**/obj/
+**/TestResults/
+**/.vscode/
+**/.idea/
+**/.DS_Store
+**/*.md
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.pdf
+docker-compose*.yml
+compose.yaml
