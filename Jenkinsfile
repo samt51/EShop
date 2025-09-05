@@ -1,14 +1,13 @@
 pipeline {
   agent any
 
-  options {
-    timestamps()
-  }
+  options { timestamps() }
 
   environment {
-    // Docker Hub kimlik bilgileri: Manage Jenkins > Credentials > (global) > ID: dockerhub-cred
+    // Manage Jenkins > Credentials > (global) > ID: dockerhub-cred
+    // Bu "username+password/token" tipi olmalı. Jenkins otomatik olarak
+    // DOCKERHUB_USR ve DOCKERHUB_PSW env değişkenlerini enjekte eder.
     DOCKERHUB       = credentials('dockerhub-cred')
-    DOCKER_NS       = 'sametbaglan'
     DOCKER_BUILDKIT = '1'
   }
 
@@ -17,8 +16,17 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
-        // Jenkins agent içindeki "dubious ownership" uyarısını sustur
         sh 'git config --global --add safe.directory "$PWD" || true'
+      }
+    }
+
+    stage('Init Env') {
+      steps {
+        script {
+          // Push namespace = login olunan Docker Hub kullanıcısı
+          env.DOCKER_NS = env.DOCKERHUB_USR
+          echo "Docker namespace set to: ${env.DOCKER_NS}"
+        }
       }
     }
 
@@ -35,14 +43,14 @@ pipeline {
     stage('Dotnet Restore & Build') {
       steps {
         sh '''
-          set -e
-          # Çözüm dosyasını bul (ilk eşleşen)
+          set -euo pipefail
           SLN="$(find . -maxdepth 3 -name "*.sln" | head -n1 || true)"
           echo "Solution: ${SLN}"
 
-          docker run --rm -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
-            set -e
-            if [ -n "${SLN}" ] && [ -f "${SLN}" ]; then
+          # SLN değerini container içine geçiyoruz
+          docker run --rm -v "$PWD":/ws -w /ws -e SLN="$SLN" mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
+            set -euo pipefail
+            if [ -n "${SLN:-}" ] && [ -f "${SLN:-}" ]; then
               dotnet restore "${SLN}"
               dotnet build   "${SLN}" -c Release --no-restore
             else
@@ -57,13 +65,13 @@ pipeline {
     stage('Tests') {
       steps {
         sh '''
-          set -e
+          set -euo pipefail
           TESTS="$(find . -name "*Test*.csproj" || true)"
           if [ -z "$TESTS" ]; then
             echo "No test projects found - continuing."
           else
             docker run --rm -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
-              set -e
+              set -euo pipefail
               for p in $(find . -name "*Test*.csproj"); do
                 echo "Running tests in $p"
                 dotnet test "$p" -c Release --no-build --logger trx || true
@@ -78,7 +86,7 @@ pipeline {
     stage('Docker Build') {
       steps {
         script {
-          // Dockerfile yolları: repo kökünden
+          // Catalog.Api klasörün gerçekten 'Catalog.Apii' ise bırak; değilse 'Catalog.Api' yap.
           def services = [
             [name: 'basket',  path: 'EShopSln/Basket.Api'],
             [name: 'catalog', path: 'EShopSln/Catalog.Apii'],
@@ -88,11 +96,12 @@ pipeline {
 
           services.each { svc ->
             sh """
+              set -euo pipefail
               echo ">>> Building image for ${svc.name}"
-              docker build \\
-                -t ${DOCKER_NS}/${svc.name}:${VERSION} \\
-                -f ${svc.path}/Dockerfile \\
-                .   # <---- build context repo kökü
+              docker build \
+                -t ${DOCKER_NS}/${svc.name}:${VERSION} \
+                -f ${svc.path}/Dockerfile \
+                .
               docker tag ${DOCKER_NS}/${svc.name}:${VERSION} ${DOCKER_NS}/${svc.name}:latest
             """
           }
@@ -107,6 +116,7 @@ pipeline {
           def services = ['basket','catalog','order','payment']
           services.each { s ->
             sh """
+              set -euo pipefail
               echo ">>> Pushing ${s}"
               docker push ${DOCKER_NS}/${s}:${VERSION}
               docker push ${DOCKER_NS}/${s}:latest
@@ -119,7 +129,6 @@ pipeline {
     stage('Deploy (docker-compose)') {
       when {
         expression {
-          // compose dosyası kökte ya da EShopSln altında olabilir
           return fileExists('docker-compose.yml') || fileExists('compose.yaml') || fileExists('EShopSln/compose.yaml')
         }
       }
@@ -129,6 +138,7 @@ pipeline {
                             (fileExists('compose.yaml') ? 'compose.yaml' :
                              (fileExists('EShopSln/compose.yaml') ? 'EShopSln/compose.yaml' : ''))
           sh """
+            set -euo pipefail
             echo "Using compose file: ${composeFile}"
             docker compose -f ${composeFile} pull
             docker compose -f ${composeFile} up -d --remove-orphans
