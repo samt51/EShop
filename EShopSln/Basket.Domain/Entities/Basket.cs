@@ -4,15 +4,8 @@ namespace Basket.Domain.Entities;
 
 public class Basket : BaseEntity  
 {
-    public string UserId { get; set; }
+    public new string UserId { get; set; }=string.Empty;
     public List<BasketItem> basketItems { get; set; }
-
-    public Basket(int id,string userId, List<BasketItem> basketItems)
-    {
-        this.Id = id;
-        this.UserId = userId;
-        this.basketItems = basketItems;
-    }
 
     public Basket()
     {

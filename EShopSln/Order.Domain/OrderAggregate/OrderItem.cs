@@ -5,12 +5,12 @@ namespace Order.Domain.OrderAggregate;
 public class OrderItem : AuditableEntity
 {
     public int ProductId { get; private set; }
-    public string ProductName { get; private set; }
-    public string PictureUrl { get; private set; }
+    public string ProductName { get; private set; }=string.Empty;
+    public string PictureUrl { get; private set; }= string.Empty;
     public Decimal Price { get; private set; }
     
     public int OrderId { get; set; }
-    public Order Order { get; set; }
+    public Order Order { get; set; } = default!;
 
     public OrderItem()
     {

@@ -4,54 +4,37 @@ namespace Order.Domain.OrderAggregate;
 
 public class Order : AuditableEntity, IAggregateRoot
 {
-    public DateTime CreatedDate { get; private set; }
 
-    public Address Address { get; private set; }
+    private readonly List<OrderItem> _orderItems = new();
 
-    public int BuyerId { get; private set; }
+    // EF Core için parametresiz ctor (materialization)
+    public Order() { }
 
-    private readonly List<OrderItem> _orderItems;
+    public Order(int? buyerId, Address address)
+    {
+        BuyerId = buyerId ?? throw new ArgumentNullException(nameof(buyerId));
+        Address = address ?? throw new ArgumentNullException(nameof(address));
+    }
+
+    
+    public Order(int id,int? buyerId, Address address)
+    {
+        Id = id;
+        BuyerId = buyerId ?? throw new ArgumentNullException(nameof(buyerId));
+        Address = address ?? throw new ArgumentNullException(nameof(address));
+    }
+    public int? BuyerId { get; private set; } = default!;
+
+    public Address Address { get; private set; } = null!; // ctor’da atanıyor
 
     public IReadOnlyCollection<OrderItem> OrderItems => _orderItems;
 
-    public Order()
+    public void AddOrderItem(int productId, string productName, decimal price, string? pictureUrl)
     {
+        pictureUrl ??= string.Empty;
+        if (_orderItems.Any(x => x.ProductId == productId)) return;
+        _orderItems.Add(new OrderItem(productId, productName, pictureUrl, price));
     }
-    public Order(int buyerId, Address address)
-    {
-        _orderItems = new List<OrderItem>();
-        CreatedDate = DateTime.UtcNow;
-        BuyerId = buyerId;
-        Address = address;
-    }
-    public Order(int id,int buyerId, Address address)
-    {
-        Id = id;
-        _orderItems = new List<OrderItem>();
-        CreatedDate = DateTime.UtcNow;
-        BuyerId = buyerId;
-        Address = address;
-    }
-    public Order(int buyerId, Address address,List<OrderItem> orderItems)
-    {
-        _orderItems = orderItems;
-        CreatedDate = DateTime.UtcNow;
-        BuyerId = buyerId;
-        Address = address;
-    }
-
-    public void AddOrderItem(int productId, string productName, decimal price, string? pictureUrl = null)
-    {
-        var normalizedPictureUrl = pictureUrl ?? string.Empty;
-
-        var existProduct = _orderItems.Any(x => x.ProductId == productId);
-        if (!existProduct)
-        {
-            var newOrderItem = new OrderItem(productId, productName, normalizedPictureUrl, price);
-            _orderItems.Add(newOrderItem);
-        }
-    }
-
-
     public decimal GetTotalPrice => _orderItems.Sum(x => x.Price);
+
 }
