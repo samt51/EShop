@@ -5,7 +5,7 @@ namespace Basket.Application.Features.BasketItemFeature.Commands.UpdateBasketIte
 
 public class UpdateBasketItemCommandRequest :  IRequest<ResponseDto<UpdateBasketItemCommandResponse>>
 {
-    public string UserId { get; set; }
+    public string UserId { get; set; } =  string.Empty;
     public int Quantity { get; set; }
     public decimal Price { get; set; }
     public int ProductId { get; set; }

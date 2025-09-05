@@ -5,7 +5,7 @@ namespace Basket.Application.Features.BasketFeature.Queries;
 
 public class GetAllBasketQueryRequest :  IRequest<ResponseDto<GetAllBasketQueryResponse>>
 {
-    public string UserId { get; set; }
+    public string UserId { get; set; } =  string.Empty;
 
     public GetAllBasketQueryRequest(string userId)
     {

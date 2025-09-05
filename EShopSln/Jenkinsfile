@@ -1,30 +1,17 @@
 pipeline {
   agent any
-
   options { timestamps() }
 
   environment {
     DOCKERHUB       = credentials('dockerhub-cred')
-    DOCKERHUB_USR   = "${DOCKERHUB_USR}"
-    DOCKERHUB_PSW   = "${DOCKERHUB_PSW}"
     DOCKER_BUILDKIT = '1'
   }
 
   stages {
-
     stage('Checkout') {
       steps {
         checkout scm
         sh 'git config --global --add safe.directory "$PWD" || true'
-      }
-    }
-
-    stage('Init Env') {
-      steps {
-        script {
-          env.DOCKER_NS = env.DOCKERHUB_USR
-          echo "Docker namespace set to: ${env.DOCKER_NS}"
-        }
       }
     }
 
@@ -33,7 +20,9 @@ pipeline {
         script {
           env.GIT_SHA = sh(returnStdout: true, script: 'git rev-parse --short=8 HEAD || echo nosha').trim()
           env.VERSION = "${env.BUILD_NUMBER}-${env.GIT_SHA}"
-          echo "VERSION=${env.VERSION}"
+          // Docker namespace: Docker Hub kullanıcı adın
+          env.DOCKER_NS = sh(returnStdout: true, script: 'printf "%s" "$DOCKERHUB_USR"').trim()
+          echo "VERSION=${env.VERSION}  DOCKER_NS=${env.DOCKER_NS}"
         }
       }
     }
@@ -80,44 +69,48 @@ pipeline {
       }
     }
 
-    stage('Docker Build') {
+    stage('Docker Build & Push (parallel)') {
       steps {
         script {
           def services = [
             [name: 'basket',  path: 'EShopSln/Basket.Api'],
-            [name: 'catalog', path: 'EShopSln/Catalog.Apii'], // klasör ismi gerçekten 'Catalog.Apii' ise bırak
+            [name: 'catalog', path: 'EShopSln/Catalog.Apii'], // repo'da gerçekten 'Catalog.Apii' var
             [name: 'order',   path: 'EShopSln/Order.Api'],
             [name: 'payment', path: 'EShopSln/Payment.Api'],
           ]
 
-          services.each { svc ->
-            sh """
-              set -eu
-              echo ">>> Building image for ${svc.name}"
-              docker build \
-                -t ${DOCKER_NS}/${svc.name}:${VERSION} \
-                -f ${svc.path}/Dockerfile \
-                .
-              docker tag ${DOCKER_NS}/${svc.name}:${VERSION} ${DOCKER_NS}/${svc.name}:latest
-            """
+          // Her servis için paralel adım oluştur
+          def branches = services.collectEntries { svc ->
+            ["${svc.name}": {
+              stage("Build ${svc.name}") {
+                sh """
+                  set -eu
+                  echo ">>> Building image for ${svc.name}"
+                  docker build \\
+                    --build-arg BUILD_VERSION=${VERSION} \\
+                    --build-arg GIT_SHA=${GIT_SHA} \\
+                    -t ${DOCKER_NS}/${svc.name}:${VERSION} \\
+                    -f ${svc.path}/Dockerfile \\
+                    .
+                  docker tag ${DOCKER_NS}/${svc.name}:${VERSION} ${DOCKER_NS}/${svc.name}:latest
+                """
+              }
+              stage("Push ${svc.name}") {
+                retry(2) {
+                  sh """
+                    set -eu
+                    echo ">>> Pushing ${svc.name}"
+                    docker push ${DOCKER_NS}/${svc.name}:${VERSION}
+                    docker push ${DOCKER_NS}/${svc.name}:latest
+                  """
+                }
+              }
+            }]
           }
-        }
-      }
-    }
 
-    stage('Docker Push') {
-      steps {
-        sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
-        script {
-          def services = ['basket','catalog','order','payment']
-          services.each { s ->
-            sh """
-              set -eu
-              echo ">>> Pushing ${s}"
-              docker push ${DOCKER_NS}/${s}:${VERSION}
-              docker push ${DOCKER_NS}/${s}:latest
-            """
-          }
+          // Docker login bir kez
+          sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
+          parallel branches
         }
       }
     }
@@ -146,11 +139,7 @@ pipeline {
   }
 
   post {
-    success {
-      echo "Build & Push OK -> ${DOCKER_NS}/*:${VERSION}"
-    }
-    always {
-      cleanWs()
-    }
+    success { echo "Build & Push OK -> ${DOCKER_NS}/*:${VERSION}" }
+    always  { cleanWs() }
   }
 }
