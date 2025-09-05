@@ -40,16 +40,18 @@ public class Order : AuditableEntity, IAggregateRoot
         Address = address;
     }
 
-    public void AddOrderItem(int productId, string productName, decimal price, string pictureUrl)
+    public void AddOrderItem(int productId, string productName, decimal price, string? pictureUrl = null)
     {
-        var existProduct = _orderItems.Any(x => x.ProductId == productId);
+        var normalizedPictureUrl = pictureUrl ?? string.Empty;
 
+        var existProduct = _orderItems.Any(x => x.ProductId == productId);
         if (!existProduct)
         {
-            var newOrderItem = new OrderItem(productId, productName, pictureUrl, price);
+            var newOrderItem = new OrderItem(productId, productName, normalizedPictureUrl, price);
             _orderItems.Add(newOrderItem);
         }
     }
+
 
     public decimal GetTotalPrice => _orderItems.Sum(x => x.Price);
 }

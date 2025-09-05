@@ -10,10 +10,10 @@ using MediatR;
 
 namespace Basket.Application.Features.BasketItemFeature.Commands.UpdateBasketItem;
 
-public class UpdateBasketItemCommandHandler(IBasketRepository repo, IMapper mapper, IPublishEndpoint publish) : BaseHandler(repo, mapper),
+public class UpdateBasketItemCommandHandler(IBasketRepository repo, IMapper mapper,IPublishEndpoint publish) : BaseHandler(repo, mapper, publish),
     IRequestHandler<UpdateBasketItemCommandRequest, ResponseDto<UpdateBasketItemCommandResponse>>
 {
-    private readonly IPublishEndpoint _publish = publish;
+   
     public async Task<ResponseDto<UpdateBasketItemCommandResponse>> Handle(UpdateBasketItemCommandRequest request, CancellationToken cancellationToken)
     {
         // satın al tetiklendiğin de 
@@ -37,7 +37,7 @@ public class UpdateBasketItemCommandHandler(IBasketRepository repo, IMapper mapp
         }
 
         var map = mapper.Map<Domain.Entities.Basket, BasketResponseDto>(basket.Data);
-        await _publish.Publish<CheckoutRequestedEvent>(new
+        await publish.Publish<CheckoutRequestedEvent>(new
         {
             BuyerId =request.UserId,
             BasketId = basket.Data.Id,

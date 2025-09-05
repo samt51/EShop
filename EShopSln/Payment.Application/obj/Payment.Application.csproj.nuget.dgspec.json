@@ -133,7 +133,7 @@
             },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[13.0.4-beta1, )"
+              "version": "[13.0.3, )"
             }
           },
           "imports": [

@@ -2,13 +2,13 @@ namespace Payment.Application.Dtos;
 
 public class AddressDto
 {
-    public string Province { get; set; }
+    public string Province { get; set; }=string.Empty;
 
-    public string District { get; set; }
+    public string District { get; set; }=string.Empty;
 
-    public string Street { get; set; }
+    public string Street { get; set; }=string.Empty;
 
-    public string ZipCode { get; set; }
+    public string ZipCode { get; set; }=string.Empty;
 
-    public string Line { get; set; }
+    public string Line { get; set; }=string.Empty;
 }

@@ -4,6 +4,7 @@ using Basket.Application.Dtos.BasketDtos;
 using Basket.Application.Interfaces.Mapping;
 using Basket.Application.Interfaces.Repositories;
 using EShop.Shared.Dtos.BasesResponses;
+using MassTransit;
 using MediatR;
 
 namespace Basket.Application.Features.BasketFeature.Queries;
@@ -12,7 +13,7 @@ public class GetAllBasketQueryHandler :  BaseHandler, IRequestHandler<GetAllBask
 {
     private readonly IBasketRepository _repo;
     private readonly IMapper _mapper;
-    public GetAllBasketQueryHandler(IBasketRepository repo, IMapper mapper) : base(repo, mapper)
+    public GetAllBasketQueryHandler(IBasketRepository repo, IMapper mapper,IPublishEndpoint publish) : base(repo, mapper,publish)
     {
         _repo = repo;
         _mapper = mapper;
