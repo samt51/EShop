@@ -20,7 +20,7 @@ public class Order : AuditableEntity, IAggregateRoot
     public Order(int buyerId, Address address)
     {
         _orderItems = new List<OrderItem>();
-        CreatedDate = DateTime.Now;
+        CreatedDate = DateTime.UtcNow;
         BuyerId = buyerId;
         Address = address;
     }
@@ -28,14 +28,14 @@ public class Order : AuditableEntity, IAggregateRoot
     {
         Id = id;
         _orderItems = new List<OrderItem>();
-        CreatedDate = DateTime.Now;
+        CreatedDate = DateTime.UtcNow;
         BuyerId = buyerId;
         Address = address;
     }
     public Order(int buyerId, Address address,List<OrderItem> orderItems)
     {
         _orderItems = orderItems;
-        CreatedDate = DateTime.Now;
+        CreatedDate = DateTime.UtcNow;
         BuyerId = buyerId;
         Address = address;
     }

@@ -7,7 +7,6 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/bin/Debug/net8.0/Order.Domain.Core.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/bin/Debug/net8.0/Order.Domain.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/bin/Debug/net8.0/Microsoft.AspNetCore.Http.Abstractions.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/bin/Debug/net8.0/System.IO.Pipelines.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/bin/Debug/net8.0/Microsoft.Extensions.Features.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/bin/Debug/net8.0/Microsoft.AspNetCore.Http.Features.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/bin/Debug/net8.0/Microsoft.Net.Http.Headers.dll

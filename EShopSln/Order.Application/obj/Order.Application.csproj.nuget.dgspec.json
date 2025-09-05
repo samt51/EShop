@@ -118,6 +118,14 @@
               "target": "Package",
               "version": "[12.0.0, )"
             },
+            "MassTransit": {
+              "target": "Package",
+              "version": "[8.5.3-develop.2360, )"
+            },
+            "MassTransit.RabbitMQ": {
+              "target": "Package",
+              "version": "[8.5.3-develop.2360, )"
+            },
             "MediatR": {
               "target": "Package",
               "version": "[13.0.0, )"
@@ -133,6 +141,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.4-beta1, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[4.3.1-dev-02383, )"
             }
           },
           "imports": [

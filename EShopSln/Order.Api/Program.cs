@@ -76,7 +76,7 @@ builder.Configuration
 
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHealthChecks();
 builder.Services.AddAuthorization();
@@ -124,6 +124,6 @@ app.Use(async (context, next) =>
         await next();
     }
 });
-app.UseOutputCache();
+
 app.MapControllers();
 app.Run();
