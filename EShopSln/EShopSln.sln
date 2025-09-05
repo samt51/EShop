@@ -51,6 +51,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{42F9B3B4-2F3B-455C-AAC5-5F2A36478273}"
 	ProjectSection(SolutionItems) = preProject
 		compose.yaml = compose.yaml
+		Jenkinsfile = Jenkinsfile
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Domain", "Order.Domain\Order.Domain.csproj", "{3B0ED081-8BFB-4A55-8463-651C84326CF5}"
