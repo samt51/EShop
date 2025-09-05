@@ -4,7 +4,7 @@ public abstract class AuditableEntity : Entity
 {
     public bool IsDeleted { get; private set; }             
     public DateTime CreatedDate { get; private set; } = DateTime.UtcNow;
-    public DateTime? ModifyDate { get; private set; }
+    public DateTime? ModifyDate { get; private set; } = null;
     public int? UserId { get; private set; }                     
     
     public void MarkCreated(int? userId = null)

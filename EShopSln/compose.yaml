@@ -10,3 +10,9 @@
     build:
       context: .
       dockerfile: Payment.Api/Dockerfile
+
+  basket.api:
+    image: basket.api
+    build:
+      context: .
+      dockerfile: Basket.Api/Dockerfile

@@ -1,12 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "mFA4nlm3WdA=",
+  "dgSpecHash": "c7yRywfLy2g=",
   "success": true,
   "projectFilePath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/Order.Infrastructure.csproj",
   "expectedPackageFiles": [
     "/Users/sametbaglan/.nuget/packages/automapper/15.0.1/automapper.15.0.1.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/fluentvalidation/12.0.0/fluentvalidation.12.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/masstransit/8.5.3-develop.2360/masstransit.8.5.3-develop.2360.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/masstransit.abstractions/8.5.3-develop.2360/masstransit.abstractions.8.5.3-develop.2360.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/masstransit.rabbitmq/8.5.3-develop.2360/masstransit.rabbitmq.8.5.3-develop.2360.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/mediatr/13.0.0/mediatr.13.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
@@ -27,6 +30,8 @@
     "/Users/sametbaglan/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/microsoft.extensions.dependencymodel/8.0.0/microsoft.extensions.dependencymodel.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/microsoft.extensions.diagnostics.abstractions/8.0.0/microsoft.extensions.diagnostics.abstractions.8.0.0.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/microsoft.extensions.diagnostics.healthchecks/8.0.0/microsoft.extensions.diagnostics.healthchecks.8.0.0.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/microsoft.extensions.diagnostics.healthchecks.abstractions/8.0.0/microsoft.extensions.diagnostics.healthchecks.abstractions.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/microsoft.extensions.fileproviders.abstractions/8.0.0/microsoft.extensions.fileproviders.abstractions.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/microsoft.extensions.hosting.abstractions/8.0.0/microsoft.extensions.hosting.abstractions.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/microsoft.extensions.logging/8.0.0/microsoft.extensions.logging.8.0.0.nupkg.sha512",
@@ -41,6 +46,8 @@
     "/Users/sametbaglan/.nuget/packages/newtonsoft.json/13.0.4-beta1/newtonsoft.json.13.0.4-beta1.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/npgsql/8.0.0/npgsql.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/npgsql.entityframeworkcore.postgresql/8.0.0/npgsql.entityframeworkcore.postgresql.8.0.0.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/rabbitmq.client/7.1.2/rabbitmq.client.7.1.2.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/serilog/4.3.1-dev-02383/serilog.4.3.1-dev-02383.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.codedom/4.4.0/system.codedom.4.4.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.collections.immutable/6.0.0/system.collections.immutable.6.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.composition/6.0.0/system.composition.6.0.0.nupkg.sha512",
@@ -50,13 +57,14 @@
     "/Users/sametbaglan/.nuget/packages/system.composition.runtime/6.0.0/system.composition.runtime.6.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.composition.typedparts/6.0.0/system.composition.typedparts.6.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.diagnostics.diagnosticsource/8.0.0/system.diagnostics.diagnosticsource.8.0.0.nupkg.sha512",
-    "/Users/sametbaglan/.nuget/packages/system.io.pipelines/6.0.3/system.io.pipelines.6.0.3.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.reflection.metadata/6.0.1/system.reflection.metadata.6.0.1.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.text.encoding.codepages/6.0.0/system.text.encoding.codepages.6.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.text.encodings.web/8.0.0/system.text.encodings.web.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.text.json/8.0.0/system.text.json.8.0.0.nupkg.sha512",
-    "/Users/sametbaglan/.nuget/packages/system.threading.channels/6.0.0/system.threading.channels.6.0.0.nupkg.sha512"
+    "/Users/sametbaglan/.nuget/packages/system.threading.channels/6.0.0/system.threading.channels.6.0.0.nupkg.sha512",
+    "/Users/sametbaglan/.nuget/packages/system.threading.ratelimiting/8.0.0/system.threading.ratelimiting.8.0.0.nupkg.sha512"
   ],
   "logs": []
 }

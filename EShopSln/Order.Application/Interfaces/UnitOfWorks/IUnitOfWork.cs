@@ -7,8 +7,9 @@ public interface IUnitOfWork: IAsyncDisposable
     IReadRepository<T> GetReadRepository<T>() where T : class, new();
     IWriteRepository<T> GetWriteRepository<T>() where T : class, new();
     void OpenTransaction();
-    Task<int> SaveAsync();
-    Task CommitAsync();
-    void RollBack();
+    Task OpenTransactionAsync(CancellationToken cancellationToken);
+    Task<int> SaveAsync(CancellationToken cancellationToken = default);
+    Task CommitAsync(CancellationToken cancellationToken = default);
+    Task RollBackAsync(CancellationToken cancellationToken = default);
 
 }

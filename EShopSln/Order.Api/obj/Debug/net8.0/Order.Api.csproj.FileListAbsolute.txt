@@ -152,3 +152,7 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Api/bin/Debug/net8.0/tr/Microsoft.CodeAnalysis.Workspaces.resources.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Api/bin/Debug/net8.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.resources.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Api/bin/Debug/net8.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Api/bin/Debug/net8.0/MassTransit.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Api/bin/Debug/net8.0/MassTransit.Abstractions.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Api/bin/Debug/net8.0/MassTransit.RabbitMqTransport.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Api/bin/Debug/net8.0/RabbitMQ.Client.dll

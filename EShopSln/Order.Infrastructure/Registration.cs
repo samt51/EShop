@@ -1,6 +1,8 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Order.Application.Consumers;
 using Order.Application.Interfaces.Mapping;
 using Order.Application.Interfaces.Repositories;
 using Order.Application.Interfaces.UnitOfWorks;
@@ -8,6 +10,8 @@ using Order.Infrastructure.Concrete.Repositories;
 using Order.Infrastructure.Concrete.UnitOfWorks;
 using Order.Infrastructure.Context;
 namespace Order.Infrastructure;
+
+
 
 public static class Registration
 {
@@ -22,6 +26,7 @@ public static class Registration
         services.AddSingleton<IMapper, Mapper>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
         
     }
 }
