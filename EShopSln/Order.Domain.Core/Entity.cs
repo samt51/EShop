@@ -4,6 +4,7 @@ public abstract class Entity
 {
     private int? _requestedHashCode;
     private int _Id;
+    
 
     public virtual int Id
     {

@@ -71,7 +71,7 @@ public class CheckoutRequestedConsumer : IConsumer<CheckoutRequestedEvent>
         }
     }
 
-    private static Task PublishFail(ConsumeContext<CheckoutRequestedEvent> ctx, string buyerId, Guid basketId, string reason)
+    private static Task PublishFail(ConsumeContext<CheckoutRequestedEvent> ctx, string buyerId, int basketId, string reason)
         => ctx.Publish<InventoryReservationFailedEvent>(new
         {
             BuyerId = buyerId,

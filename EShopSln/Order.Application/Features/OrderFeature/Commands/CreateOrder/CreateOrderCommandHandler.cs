@@ -22,7 +22,7 @@ public class CreateOrderCommandHandler : BaseHandler,IRequestHandler<CreateOrder
 
         request.OrderItems.ForEach(x =>
         {
-            newOrder.AddOrderItem(x.ProductId, x.ProductName, x.Price, x.PictureUrl);
+            newOrder.AddOrderItem(x.ProductId, x.ProductName ?? string.Empty, x.Price, x.PictureUrl);
         });
         
         var save = await unitOfWork.GetWriteRepository<Domain.OrderAggregate.Order>().AddAsync(newOrder, cancellationToken);

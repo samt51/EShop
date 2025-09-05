@@ -2,28 +2,32 @@
 
 namespace EShop.Shared.Messages
 {
-    public class CreateOrderMessageCommand
+    public sealed class CreateOrderMessageCommand
     {
-        public CreateOrderMessageCommand()
-        {
-            OrderItems = new List<OrderItem>();
-        }
+        // Adres alanları
+        public string Province { get; init; } = string.Empty;
+        public string District { get; init; } = string.Empty;
+        public string Street   { get; init; } = string.Empty;
+        public string ZipCode  { get; init; } = string.Empty;
+        public string Line     { get; init; } = string.Empty;
 
-        public int BuyerId { get; set; }
+        // Diğer alanlar…
+        public string BuyerId  { get; init; } = string.Empty;
 
-        public List<OrderItem> OrderItems { get; set; }
+        public List<CreateOrderItem> Items { get; init; } = new();
 
-        public string Province { get; set; }
-
-        public string District { get; set; }
-
-        public string Street { get; set; }
-
-        public string ZipCode { get; set; }
-
-        public string Line { get; set; }
+        public CreateOrderMessageCommand() { }
     }
 
+    
+    public sealed class CreateOrderItem
+    {
+        public int    ProductId   { get; init; }
+        public string ProductName { get; init; } = string.Empty;
+        public decimal Price      { get; init; }
+        public string PictureUrl  { get; init; } = string.Empty;
+        public int    Count       { get; init; }
+    }
     public class OrderItem
     {
         public int ProductId { get; set; }

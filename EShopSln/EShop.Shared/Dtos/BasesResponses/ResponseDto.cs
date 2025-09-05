@@ -2,13 +2,13 @@ namespace EShop.Shared.Dtos.BasesResponses;
 
 public class ResponseDto<T>
 {
-    public T Data { get; set; }
+    public T Data { get; set; }= default!;
 
-    public int StatusCode { get; set; }
+    public int StatusCode { get;init; }
 
     public bool IsSuccess { get; set; }
 
-    public List<string> Errors { get; set; }
+    public List<string> Errors { get; set; }= new();
 
     public ResponseDto<T> Success()
     {

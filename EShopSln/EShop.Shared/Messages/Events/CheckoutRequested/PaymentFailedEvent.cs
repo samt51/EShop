@@ -1,8 +1,9 @@
 namespace EShop.Shared.Messages.Events.CheckoutRequested;
 
-public class PaymentFailedEvent
+public sealed class PaymentFailedEvent
 {
-  public  Guid CorrelationId { get; }
-   public string BuyerId { get; init; }
-   public string Reason { get; init; }
+    public string BuyerId { get; init; } = string.Empty;
+    public string Reason  { get; init; } = string.Empty;
+
+    public PaymentFailedEvent() { }
 }
