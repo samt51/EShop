@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "c7yRywfLy2g=",
+  "dgSpecHash": "RUNxCukhZjU=",
   "success": true,
   "projectFilePath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Infrastructure/Order.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -47,7 +47,6 @@
     "/Users/sametbaglan/.nuget/packages/npgsql/8.0.0/npgsql.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/npgsql.entityframeworkcore.postgresql/8.0.0/npgsql.entityframeworkcore.postgresql.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/rabbitmq.client/7.1.2/rabbitmq.client.7.1.2.nupkg.sha512",
-    "/Users/sametbaglan/.nuget/packages/serilog/4.3.1-dev-02383/serilog.4.3.1-dev-02383.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.codedom/4.4.0/system.codedom.4.4.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.collections.immutable/6.0.0/system.collections.immutable.6.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.composition/6.0.0/system.composition.6.0.0.nupkg.sha512",

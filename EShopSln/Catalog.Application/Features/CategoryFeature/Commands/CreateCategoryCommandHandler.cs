@@ -20,13 +20,13 @@ public class CreateCategoryCommandHandler :  BaseHandler, IRequestHandler<Create
     {
         var data = mapper.Map<Category, CreateCategoryCommandRequest>(request);
         
-        unitOfWork.OpenTransaction();
+        await unitOfWork.OpenTransactionAsync(cancellationToken);
         
         await unitOfWork.GetWriteRepository<Category>().AddAsync(data, cancellationToken);
 
-        await unitOfWork.SaveAsync();
+       await unitOfWork.SaveAsync(cancellationToken);
 
-        await unitOfWork.CommitAsync();
+        await unitOfWork.CommitAsync(cancellationToken);
         
         await _outputCache.EvictByTagAsync("departments", cancellationToken);
         

@@ -17,6 +17,7 @@ namespace Order.Application;
             {
                 x.AddConsumer<PaymentAuthorizedConsumer>(c => c.ConcurrentMessageLimit = 8);
 
+
                 x.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host(configuration["RabbitMQUrl"], "/", h =>

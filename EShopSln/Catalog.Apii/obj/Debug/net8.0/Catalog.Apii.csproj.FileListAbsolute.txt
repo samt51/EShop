@@ -115,3 +115,7 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/obj/Debug/net8.0/Catalog.Apii.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/obj/Debug/net8.0/Catalog.Apii.genruntimeconfig.cache
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/obj/Debug/net8.0/ref/Catalog.Apii.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.Abstractions.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.RabbitMqTransport.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/RabbitMQ.Client.dll

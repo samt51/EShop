@@ -1796,9 +1796,9 @@
           "MediatR": "13.0.0",
           "MediatR.Contracts": "2.0.1",
           "Microsoft.EntityFrameworkCore": "8.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
           "Newtonsoft.Json": "13.0.4-beta1",
-          "Order.Domain": "1.0.0",
-          "Serilog": "4.3.1-dev-02383"
+          "Order.Domain": "1.0.0"
         },
         "compile": {
           "bin/placeholder/Order.Application.dll": {}

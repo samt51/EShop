@@ -18,6 +18,7 @@
       <ProjectReference Include="..\Basket.Domain\Basket.Domain.csproj" />
       <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\EShop.Shared\EShop.Shared.csproj" />
+      <ProjectReference Include="..\Order.Application\Order.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>
