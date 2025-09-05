@@ -819,7 +819,10 @@
         },
         "runtime": {
           "bin/placeholder/Payment.Application.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       }
     }
   },

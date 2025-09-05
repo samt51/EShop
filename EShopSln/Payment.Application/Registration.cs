@@ -3,8 +3,6 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Payment.Application.Consumers.OrderConsumer;
-using Payment.Application.Middleware.Exceptions;
-using MediatR;
 using Payment.Application.Consumers.InventoryConsumers;
 
 namespace Payment.Application;
@@ -17,7 +15,7 @@ public static class Registration
         
         var assembly = Assembly.GetExecutingAssembly();
 
-        services.AddTransient<ExceptionMiddleware>();
+    
             
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
       

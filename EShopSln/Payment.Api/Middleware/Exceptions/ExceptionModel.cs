@@ -1,7 +1,7 @@
 using EShop.Shared.Dtos.BasesResponses;
 using Newtonsoft.Json;
 
-namespace Payment.Application.Middleware.Exceptions;
+namespace Payment.Api.Middleware.Exceptions;
 
 public class ExceptionModel
 {

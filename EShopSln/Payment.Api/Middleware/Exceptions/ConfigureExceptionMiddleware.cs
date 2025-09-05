@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace Payment.Application.Middleware.Exceptions;
+namespace Payment.Api.Middleware.Exceptions;
 
 public static class ConfigureExceptionMiddleware
 {

@@ -1,8 +1,8 @@
 
 
 using Microsoft.OpenApi.Models;
+using Payment.Api.Middleware.Exceptions;
 using Payment.Application;
-using Payment.Application.Middleware.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +18,7 @@ builder.Configuration
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddTransient<ExceptionMiddleware>();
 
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 

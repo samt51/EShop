@@ -1,9 +1,8 @@
 using System.Text.Json;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
-namespace Payment.Application.Middleware.Exceptions
+
+namespace Payment.Api.Middleware.Exceptions
 {
     public class ExceptionMiddleware : IMiddleware
     {
