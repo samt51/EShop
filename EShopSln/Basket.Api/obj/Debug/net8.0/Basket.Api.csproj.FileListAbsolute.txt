@@ -95,3 +95,4 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Order.Application.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Order.Domain.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Order.Domain.Core.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Api/bin/Debug/net8.0/Microsoft.Bcl.AsyncInterfaces.dll

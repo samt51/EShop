@@ -438,21 +438,17 @@
               "target": "Package",
               "version": "[13.0.0, )"
             },
-            "Microsoft.AspNetCore.Http.Abstractions": {
-              "target": "Package",
-              "version": "[2.3.0, )"
-            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.0, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[13.0.4-beta1, )"
+              "version": "[13.0.3, )"
             },
             "Serilog": {
               "target": "Package",
-              "version": "[4.3.1-dev-02373, )"
+              "version": "[3.1.1, )"
             }
           },
           "imports": [
@@ -467,6 +463,9 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
@@ -653,11 +652,11 @@
             },
             "MassTransit": {
               "target": "Package",
-              "version": "[8.5.3-develop.2360, )"
+              "version": "[8.0.0, )"
             },
             "MassTransit.RabbitMQ": {
               "target": "Package",
-              "version": "[8.5.3-develop.2360, )"
+              "version": "[8.0.0, )"
             },
             "MediatR": {
               "target": "Package",
@@ -677,7 +676,7 @@
             },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[13.0.4-beta1, )"
+              "version": "[13.0.3, )"
             }
           },
           "imports": [
@@ -692,6 +691,9 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }

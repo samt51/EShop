@@ -8,25 +8,25 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EShop.Shared\EShop.Shared.csproj" />
-      <ProjectReference Include="..\Order.Domain\Order.Domain.csproj" />
+        <ProjectReference Include="..\EShop.Shared\EShop.Shared.csproj" />
+        <ProjectReference Include="..\Order.Domain\Order.Domain.csproj" />
+    </ItemGroup>
+
+    <!-- ASP.NET Core API'larını (Microsoft.AspNetCore.Builder, Http, IMiddleware vs.) getirir -->
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="12.0.0" />
-      <PackageReference Include="MassTransit" Version="8.5.3-develop.2360" />
-      <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.3-develop.2360" />
-      <PackageReference Include="MediatR" Version="13.0.0" />
-      <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1" />
+        <PackageReference Include="FluentValidation" Version="12.0.0" />
+        <PackageReference Include="MassTransit" Version="8.0.0" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
+        <PackageReference Include="MediatR" Version="13.0.0" />
+        <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
-        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.13\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
+    <!-- KALDIRILDI: Elle eklenen Microsoft.AspNetCore.Http.Abstractions Reference/HintPath -->
 </Project>
