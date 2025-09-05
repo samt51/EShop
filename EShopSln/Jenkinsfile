@@ -2,9 +2,8 @@ pipeline {
   agent any
   options {
     timestamps()
-    ansiColor('xterm')
-    timeout(time: 45, unit: 'MINUTES')  // tüm pipeline üst sınırı
-    disableResume()                      // restart sonrası takılmayı engelle
+    timeout(time: 45, unit: 'MINUTES')
+    disableResume()
   }
 
   environment {
@@ -82,12 +81,11 @@ pipeline {
         script {
           def services = [
             [name: 'basket',  path: 'EShopSln/Basket.Api'],
-            [name: 'catalog', path: 'EShopSln/Catalog.Apii'], // repo'da gerçekten 'Catalog.Apii' var
+            [name: 'catalog', path: 'EShopSln/Catalog.Apii'],
             [name: 'order',   path: 'EShopSln/Order.Api'],
             [name: 'payment', path: 'EShopSln/Payment.Api'],
           ]
 
-          // once: docker login (retry ile)
           retry(2) {
             sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
           }
@@ -124,13 +122,13 @@ pipeline {
             }]
           }
 
-          parallel branches + [failFast: true]
+          // Declarative içinde scripted parallel: failFast böyle verilir
+          parallel branches, failFast: true
         }
       }
       post {
         always {
           sh 'docker logout || true'
-          // Disk şişmesini önlemek istersen açık bırak:
           sh 'docker builder prune -af || true'
         }
       }
