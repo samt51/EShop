@@ -1,24 +1,17 @@
 pipeline {
   agent any
 
-  options {
-    timestamps()
-    //ansiColor('xterm')
-  }
+  options { timestamps() }
 
   environment {
-    // Docker Hub kimlik bilgisi: Jenkins > Credentials'da oluşturdun (Username + Password)
-    DOCKERHUB = credentials('dockerhub-cred')
-    DOCKER_NS = 'sametbaglan'       // Docker Hub kullanıcı/organization adın
+    DOCKERHUB = credentials('dockerhub-cred')   // Jenkins > Credentials'da oluşturduğun ID
+    DOCKER_NS = 'sametbaglan'                   // Docker Hub kullanıcı/organization adın
     DOCKER_BUILDKIT = '1'
-    GIT_SHA = sh(script: "git rev-parse --short=8 HEAD || echo nosha", returnStdout: true).trim()
-    VERSION = "${env.BUILD_NUMBER}-${GIT_SHA}"
+    GIT_SHA  = sh(script: "git rev-parse --short=8 HEAD || echo nosha", returnStdout: true).trim()
+    VERSION  = "${env.BUILD_NUMBER}-${GIT_SHA}"
   }
 
-  triggers {
-    // GitHub webhook bağlarsan otomatik tetikler
-    githubPush()
-  }
+  triggers { githubPush() }
 
   stages {
 
@@ -30,15 +23,20 @@ pipeline {
       steps {
         sh '''
           set -e
-          # Çözüm dosyan büyük olasılıkla kökte: EShopSln.sln
-          if [ -f ./EShopSln.sln ]; then
-            dotnet restore ./EShopSln.sln
-            dotnet build   ./EShopSln.sln -c Release --no-restore
-          else
-            # garanti olsun diye fallback
-            find . -name "*.csproj" -print0 | xargs -0 -I{} dotnet restore "{}"
-            find . -name "*.csproj" -print0 | xargs -0 -I{} dotnet build "{}" -c Release --no-restore
-          fi
+          # .sln dosyasını herhangi bir yerde bul (ilkini al)
+          SLN="$(find . -maxdepth 3 -name '*.sln' | head -n1 || true)"
+          echo "Solution: ${SLN:-none}"
+
+          docker run --rm -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc "
+            set -e
+            if [ -n \\"$SLN\\" ] && [ -f \\"$SLN\\" ]; then
+              dotnet restore \\"$SLN\\"
+              dotnet build   \\"$SLN\\" -c Release --no-restore
+            else
+              find . -name '*.csproj' -print0 | xargs -0 -I{} dotnet restore '{}'
+              find . -name '*.csproj' -print0 | xargs -0 -I{} dotnet build   '{}' -c Release --no-restore
+            fi
+          "
         '''
       }
     }
@@ -47,15 +45,18 @@ pipeline {
       steps {
         sh '''
           set -e
-          # *Test*.csproj olanları çalıştır
-          FOUND=0
-          for p in $(find . -name "*Test*.csproj"); do
-            FOUND=1
-            dotnet test "$p" -c Release --no-build --logger trx || true
-          done
-          if [ "$FOUND" -eq 0 ]; then
-            echo "No test projects found - continuing."
-          fi
+          docker run --rm -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc "
+            set -e
+            FOUND=0
+            for p in \$(find . -name '*Test*.csproj'); do
+              FOUND=1
+              echo Running tests in \$p
+              dotnet test \\"$p\\" -c Release --no-build --logger trx || true
+            done
+            if [ \\"$FOUND\\" -eq 0 ]; then
+              echo 'No test projects found - continuing.'
+            fi
+          "
         '''
         junit allowEmptyResults: true, testResults: '**/TestResults/*.trx'
       }
@@ -64,14 +65,13 @@ pipeline {
     stage('Docker Build') {
       steps {
         script {
-          // Servis listesi: klasör ve dockerfile konumları ekran görüntündeki mimariye göre
+          // Projendeki dockerfile yollarına göre
           def services = [
             [name: 'basket',  path: 'src/Basket.Service/Presentation/Basket.Api'],
             [name: 'catalog', path: 'src/Catalog.Service/Presentation/Catalog.Api'],
             [name: 'order',   path: 'src/Order.Service/Presentation/Order.Api'],
             [name: 'payment', path: 'src/Payment.Service/Presentation/Payment.Api'],
           ]
-
           for (svc in services) {
             sh """
               echo ">>> Building image for ${svc.name}"
@@ -99,7 +99,6 @@ pipeline {
       }
     }
 
-    // (Opsiyonel) docker-compose varsa local/stage ayağa kaldır
     stage('Deploy (docker-compose)') {
       when { expression { fileExists('docker-compose.yml') } }
       steps {
@@ -110,10 +109,9 @@ pipeline {
         '''
       }
     }
-  }
 
-  post {
-    success { echo "Build & Push OK -> ${DOCKER_NS}/*:${VERSION}" }
-    always  { cleanWs() }
+    stage('Cleanup') {
+      steps { deleteDir() }  // workspace'i güvenli şekilde temizler
+    }
   }
 }
