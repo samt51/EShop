@@ -61,12 +61,12 @@ pipeline {
     stage('Docker Build') {
       steps {
         script {
-          def services = [
-            [name: 'basket',  path: 'EShopSln/src/Basket.Service/Presentation/Basket.Api'],
-            [name: 'catalog', path: 'EShopSln/src/Catalog.Service/Presentation/Catalog.Api'],
-            [name: 'order',   path: 'EShopSln/src/Order.Service/Presentation/Order.Api'],
-            [name: 'payment', path: 'EShopSln/src/Payment.Service/Presentation/Payment.Api'],
-          ]
+         def services = [
+  [name: 'basket',  path: 'EShopSln/Basket.Api'],
+  [name: 'catalog', path: 'EShopSln/Catalog.Apii'],
+  [name: 'order',   path: 'EShopSln/Order.Api'],
+  [name: 'payment', path: 'EShopSln/Payment.Api'],
+]
           for (svc in services) {
             sh """
               echo ">>> Building image for ${svc.name}"
