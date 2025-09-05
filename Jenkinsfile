@@ -4,7 +4,7 @@ pipeline {
   options { timestamps() }
 
   environment {
-    DOCKERHUB = credentials('dockerhub-cred')   // Jenkins > Credentials'da oluşturduğun ID
+    DOCKERHUB = credentials('dockerhub-cred')   // Jenkins > Credentials ID
     DOCKER_NS = 'sametbaglan'                   // Docker Hub kullanıcı/organization adın
     DOCKER_BUILDKIT = '1'
     GIT_SHA  = sh(script: "git rev-parse --short=8 HEAD || echo nosha", returnStdout: true).trim()
@@ -23,7 +23,6 @@ pipeline {
       steps {
         sh '''
           set -e
-          # .sln dosyasını herhangi bir yerde bul (ilkini al)
           SLN="$(find . -maxdepth 3 -name '*.sln' | head -n1 || true)"
           echo "Solution: ${SLN:-none}"
 
@@ -65,13 +64,12 @@ pipeline {
     stage('Docker Build') {
       steps {
         script {
-          // Projendeki dockerfile yollarına göre
-         def services = [
-  [name: 'basket',  path: 'EShopSln/src/Basket.Service/Presentation/Basket.Api'],
-  [name: 'catalog', path: 'EShopSln/src/Catalog.Service/Presentation/Catalog.Api'],
-  [name: 'order',   path: 'EShopSln/src/Order.Service/Presentation/Order.Api'],
-  [name: 'payment', path: 'EShopSln/src/Payment.Service/Presentation/Payment.Api'],
-]
+          def services = [
+            [name: 'basket',  path: 'EShopSln/src/Basket.Service/Presentation/Basket.Api'],
+            [name: 'catalog', path: 'EShopSln/src/Catalog.Service/Presentation/Catalog.Api'],
+            [name: 'order',   path: 'EShopSln/src/Order.Service/Presentation/Order.Api'],
+            [name: 'payment', path: 'EShopSln/src/Payment.Service/Presentation/Payment.Api'],
+          ]
           for (svc in services) {
             sh """
               echo ">>> Building image for ${svc.name}"
@@ -111,7 +109,7 @@ pipeline {
     }
 
     stage('Cleanup') {
-      steps { deleteDir() }  // workspace'i güvenli şekilde temizler
+      steps { deleteDir() }
     }
   }
 }
