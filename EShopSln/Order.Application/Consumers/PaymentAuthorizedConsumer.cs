@@ -1,10 +1,10 @@
-using EShop.Shared.Messages;
 using EShop.Shared.Messages.Commands.Payments;
 using EShop.Shared.Messages.Events;
+using EShop.Shared.Messages.Events.CheckoutRequested;
 using MassTransit;
 using Order.Application.Interfaces.UnitOfWorks;
-using Serilog;
 using ArgumentException = System.ArgumentException;
+using OrderCreatedEvent = EShop.Shared.Messages.Events.OrderCreatedEvent;
 
 namespace Order.Application.Consumers
 {
@@ -55,12 +55,10 @@ namespace Order.Application.Consumers
                     Total   = order.GetTotalPrice   // property'in adı sende böyle
                 }, context.CancellationToken);
 
-                Log.Information("Order {OrderId} created for {Buyer}", order.Id, msg.BuyerId);
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollBackAsync(context.CancellationToken);
-                Log.Error(ex, "Order creation failed for Buyer {BuyerId}", msg.BuyerId);
 
            
                 await context.Send<RefundPaymentCommand>(new
@@ -68,6 +66,12 @@ namespace Order.Application.Consumers
                     CorrelationId = context.CorrelationId ?? Guid.NewGuid(),
                     PaymentId = msg.PaymentId,   
                     Reason = "OrderCreationFailed"
+                }, context.CancellationToken);
+                
+                await context.Publish<InventoryReservationReleaseRequestedEvent>(new
+                {
+                    BuyerId = msg.BuyerId,
+                    BasketId=Guid.NewGuid(),
                 }, context.CancellationToken);
 
                 throw; 

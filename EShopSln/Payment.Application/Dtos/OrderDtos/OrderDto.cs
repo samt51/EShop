@@ -7,12 +7,12 @@ public class OrderDto
 {
     public OrderDto()
     {
-        OrderItems = new List<EShop.Shared.Messages.OrderItemDto>();
+        OrderItems = new List<EShop.Shared.Dtos.OrderItemDto>();
     }
 
     public int BuyerId { get; set; }
 
-    public List<EShop.Shared.Messages.OrderItemDto> OrderItems { get; set; }
+    public List<EShop.Shared.Dtos.OrderItemDto> OrderItems { get; set; }
 
     public AddressDto Address { get; set; }
 }

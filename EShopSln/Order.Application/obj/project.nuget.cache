@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "T5mKvvQWaC0=",
+  "dgSpecHash": "EdIasTWs1Ik=",
   "success": true,
   "projectFilePath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Application/Order.Application.csproj",
   "expectedPackageFiles": [
@@ -35,7 +35,6 @@
     "/Users/sametbaglan/.nuget/packages/microsoft.identitymodel.tokens/8.0.1/microsoft.identitymodel.tokens.8.0.1.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/newtonsoft.json/13.0.4-beta1/newtonsoft.json.13.0.4-beta1.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/rabbitmq.client/7.1.2/rabbitmq.client.7.1.2.nupkg.sha512",
-    "/Users/sametbaglan/.nuget/packages/serilog/4.3.1-dev-02383/serilog.4.3.1-dev-02383.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.diagnostics.diagnosticsource/8.0.0/system.diagnostics.diagnosticsource.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
     "/Users/sametbaglan/.nuget/packages/system.threading.ratelimiting/8.0.0/system.threading.ratelimiting.8.0.0.nupkg.sha512"

@@ -17,13 +17,13 @@ public class CreateProductCommandHandler :  BaseHandler, IRequestHandler<CreateP
     {
         var map = mapper.Map<Product, CreateProductCommandRequest>(request);
         
-        unitOfWork.OpenTransaction();
+       await unitOfWork.OpenTransactionAsync(cancellationToken);
         
         await unitOfWork.GetWriteRepository<Product>().AddAsync(map, cancellationToken);
 
-        await unitOfWork.SaveAsync();
+        await unitOfWork.SaveAsync(cancellationToken);
 
-        await unitOfWork.CommitAsync();
+        await unitOfWork.CommitAsync(cancellationToken);
         
         return new ResponseDto<CreateProductCommandResponse>().Success();   
     }

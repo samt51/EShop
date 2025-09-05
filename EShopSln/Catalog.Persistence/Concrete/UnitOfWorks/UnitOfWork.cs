@@ -12,36 +12,34 @@ public class UnitOfWork : IUnitOfWork
     {
         this.dbContext = dbContext;
     }
-    public async Task CommitAsync()
+    public async Task CommitAsync(CancellationToken cancellationToken = default)
     {
-        await dbContext.Database.CommitTransactionAsync();
+        await dbContext.Database.CommitTransactionAsync(cancellationToken);
+    }
+
+    public async Task RollBackAsync(CancellationToken cancellationToken = default)
+    {
+        await dbContext.Database.RollbackTransactionAsync(cancellationToken);
     }
 
     public async ValueTask DisposeAsync() => await dbContext.DisposeAsync();
 
-    public void OpenTransaction()
+    public async Task OpenTransactionAsync(CancellationToken? cancellationToken = null)
     {
-        dbContext.Database.BeginTransactionAsync();
+       await dbContext.Database.BeginTransactionAsync();
     }
-        
-
-    public void RollBack()
-    {
-        dbContext.Database.RollbackTransaction();
-    }
-
-    public int Save() => dbContext.SaveChanges();
-    public async Task<int> SaveAsync()
+    
+    public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
     {
 
         try
         {
-            var result = await dbContext.SaveChangesAsync();
+            var result = await dbContext.SaveChangesAsync(cancellationToken);
             return result;
         }
         catch (Exception ex)
-        {
-            RollBack();
+        { 
+            await RollBackAsync(cancellationToken);
             throw new Exception(ex.Message);
 
         }

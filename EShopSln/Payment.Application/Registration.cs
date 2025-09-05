@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Payment.Application.Consumers.OrderConsumer;
 using Payment.Application.Middleware.Exceptions;
 using MediatR;
+using Payment.Application.Consumers.InventoryConsumers;
 
 namespace Payment.Application;
 
@@ -19,12 +20,14 @@ public static class Registration
         services.AddTransient<ExceptionMiddleware>();
             
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
-        // MediatR, middleware kayıtların… (değiştirmene gerek yok)
+      
 
         services.AddMassTransit(x =>
         {
             x.AddConsumer<OrderCreatedConsumer>(c => c.ConcurrentMessageLimit = 8);
             x.AddConsumer<RefundPaymentConsumer>(c => c.ConcurrentMessageLimit = 8);
+            x.AddConsumer<InventoryReservedConsumer>();
+            x.AddConsumer<RefundPaymentConsumer>();
 
             x.UsingRabbitMq((ctx, cfg) =>
             {

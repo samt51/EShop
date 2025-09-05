@@ -89,7 +89,7 @@ builder.Services.AddSwaggerGen(o =>
 
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddHealthChecks();
 builder.Services.AddAuthorization();

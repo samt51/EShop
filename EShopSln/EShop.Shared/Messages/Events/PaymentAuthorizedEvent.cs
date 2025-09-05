@@ -1,3 +1,5 @@
+using EShop.Shared.Dtos;
+
 namespace EShop.Shared.Messages.Events;
 
 public sealed class PaymentAuthorizedEvent
