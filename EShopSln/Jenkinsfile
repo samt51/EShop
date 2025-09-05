@@ -7,7 +7,8 @@ pipeline {
   }
 
   environment {
-    DOCKERHUB       = credentials('dockerhub-cred') // DOCKERHUB_USR / DOCKERHUB_PSW
+    // DOCKERHUB_USR / DOCKERHUB_PSW bu credentialdan gelecek
+    DOCKERHUB       = credentials('dockerhub-cred')
     DOCKER_BUILDKIT = '1'
   }
 
@@ -86,10 +87,12 @@ pipeline {
             [name: 'payment', path: 'EShopSln/Payment.Api'],
           ]
 
+          // Docker login bir kez
           retry(2) {
             sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
           }
 
+          // Paralel branch map'i
           def branches = services.collectEntries { svc ->
             ["${svc.name}": {
               stage("Build ${svc.name}") {
@@ -122,7 +125,9 @@ pipeline {
             }]
           }
 
-          parallel branches, failFast: true
+          // failFast opsiyonunu map'e ekleyip tek argümanla çağır
+          branches['failFast'] = true
+          parallel branches
         }
       }
       post {
