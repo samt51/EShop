@@ -34,7 +34,7 @@ pipeline {
       steps {
         timeout(time: 15, unit: 'MINUTES') {
           sh '''
-            set -euo pipefail
+            set -eu
             SLN="$(find . -maxdepth 3 -name "*.sln" | head -n1 || true)"
             echo "Solution: ${SLN}"
 
@@ -57,7 +57,7 @@ pipeline {
       steps {
         timeout(time: 10, unit: 'MINUTES') {
           sh '''
-            set -euo pipefail
+            set -eu
             TESTS="$(find . -name "*Test*.csproj" || true)"
             if [ -z "$TESTS" ]; then
               echo "No test projects found - continuing."
@@ -95,7 +95,7 @@ pipeline {
               stage("Build ${svc.name}") {
                 timeout(time: 20, unit: 'MINUTES') {
                   sh """
-                    set -euo pipefail
+                    set -eu
                     echo ">>> Building image for ${svc.name}"
                     docker build \\
                       --build-arg BUILD_VERSION=${VERSION} \\
@@ -111,7 +111,7 @@ pipeline {
                 timeout(time: 10, unit: 'MINUTES') {
                   retry(2) {
                     sh """
-                      set -euo pipefail
+                      set -eu
                       echo ">>> Pushing ${svc.name}"
                       docker push ${DOCKER_NS}/${svc.name}:${VERSION}
                       docker push ${DOCKER_NS}/${svc.name}:latest
@@ -122,7 +122,6 @@ pipeline {
             }]
           }
 
-          // Declarative içinde scripted parallel: failFast böyle verilir
           parallel branches, failFast: true
         }
       }
@@ -147,7 +146,7 @@ pipeline {
                               (fileExists('compose.yaml') ? 'compose.yaml' :
                                (fileExists('EShopSln/compose.yaml') ? 'EShopSln/compose.yaml' : ''))
             sh """
-              set -euo pipefail
+              set -eu
               echo "Using compose file: ${composeFile}"
               docker compose -f ${composeFile} pull
               docker compose -f ${composeFile} up -d --remove-orphans
