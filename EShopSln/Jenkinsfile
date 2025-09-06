@@ -1,11 +1,11 @@
 pipeline {
   agent any
 
-environment {
-  DOCKERHUB_CRED = credentials('dockerhub-cred')   
-  GITHUB_PAT     = credentials('github-pat')
-  DOCKER_NS      = "samt51"
-}
+  environment {
+    DOCKERHUB_CRED = credentials('dockerhub-cred')   // Jenkins Credentials ID
+    GITHUB_PAT     = credentials('github-pat')       // (SCM erişimi için)
+    DOCKER_NS      = "samt51"
+  }
 
   options {
     timestamps()
@@ -76,25 +76,23 @@ environment {
       }
     }
 
-stage('Docker Login') {
-  steps {
-    retry(2) {
-      withCredentials([usernamePassword(
-        credentialsId: 'dockerhub-cred',      // Jenkins'teki doğru ID
-        usernameVariable: 'DOCKERHUB_USR',
-        passwordVariable: 'DOCKERHUB_PSW'
-      )]) {
-        sh '''
-          set -eu
-          echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
-          # (opsiyonel) Docker daemon ayakta mı hızlı kontrol
-          docker info >/dev/null 2>&1
-        '''
+    stage('Docker Login') {
+      steps {
+        retry(2) {
+          withCredentials([usernamePassword(
+            credentialsId: 'dockerhub-cred',
+            usernameVariable: 'DOCKERHUB_USR',
+            passwordVariable: 'DOCKERHUB_PSW'
+          )]) {
+            sh '''
+              set -eu
+              echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
+              docker info >/dev/null 2>&1
+            '''
+          }
+        }
       }
     }
-  }
-}
-
 
     stage('Docker Build & Push') {
       stages {
@@ -214,17 +212,20 @@ stage('Docker Login') {
             error "Compose file not found: ${composeFile}"
           }
         }
+        // Proje adı vererek (eshopci) lokal compose ile çakışmayı önle
         sh '''
           set -eu
           echo "Using compose file: EShopSln/compose.yaml"
-          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml pull
-          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml up -d --remove-orphans
-          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml ps
+          export COMPOSE_CMD='docker compose -p eshopci -f EShopSln/compose.yaml'
+
+          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" $COMPOSE_CMD pull
+          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" $COMPOSE_CMD down --remove-orphans || true
+          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" $COMPOSE_CMD up -d --force-recreate
+          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" $COMPOSE_CMD ps
         '''
       }
     }
 
-    // --- Safer: temizlik ayrı bir stage'de, node bağlamı garanti ---
     stage('Cleanup') {
       when { expression { true } }
       steps {
@@ -238,10 +239,7 @@ stage('Docker Login') {
     }
   }
 
-  // Post'u boş/çok hafif tutuyoruz; workspace context sorun çıkarmaz
   post {
-    always {
-      echo 'Pipeline finished.'
-    }
+    always { echo 'Pipeline finished.' }
   }
 }
