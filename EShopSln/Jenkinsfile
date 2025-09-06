@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_CRED = credentials('dockerhub')   // Jenkins Credentials ID
-    GITHUB_PAT     = credentials('github-pat')  // (checkout için kullanılabilir)
+    DOCKERHUB_CRED = credentials('dockerhub')
+    GITHUB_PAT     = credentials('github-pat')
     DOCKER_NS      = "samt51"
   }
 
@@ -213,20 +213,24 @@ pipeline {
         '''
       }
     }
-  } // end stages
+  }
 
   post {
     always {
-      // Bazı Jenkins kurulumlarında post aşamasında workspace context'i düşebiliyor.
-      // Bu nedenle node içine alıyoruz.
-      node {
-        sh '''
-          set +e
-          docker logout || true
-          docker builder prune -af || true
-        '''
-        cleanWs()
+      // 'node' kullanmadan; declarative agent already provides workspace context
+      script {
+        try {
+          sh '''
+            set +e
+            docker logout || true
+            docker builder prune -af || true
+          '''
+        } catch (e) {
+          echo "Cleanup warning: ${e}"
+        } finally {
+          cleanWs()
+        }
       }
     }
   }
-} // end pipeline
+}
