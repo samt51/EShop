@@ -1,26 +1,11 @@
-﻿# EShopSln/compose.yaml
-name: eshop
-
-# Tekrarlanan RabbitMQ env'lerini tek yerde toplayalım
-x-mt-rabbit: &mt_rabbit
-  RABBITMQ_HOST: rabbitmq
-  RABBITMQ_USERNAME: guest
-  RABBITMQ_PASSWORD: guest
-  RabbitMQ__Host: rabbitmq
-  RabbitMQ__Username: guest
-  RabbitMQ__Password: guest
-
+﻿name: eshop
 networks:
   eshop-net:
 
 services:
   rabbitmq:
     image: rabbitmq:3.13-management
-    # container_name: eshop-rabbitmq   # ÇAKIŞMA YARATTIĞI İÇİN KALDIRILDI
-    hostname: rabbitmq
-    ports:
-      - "15672:15672"   # Management UI (guest/guest)
-      - "5672:5672"     # AMQP (host'tan erişmek istersen)
+    # container_name: KULLANMA (CI'da çakışma yapar)
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 5s
@@ -35,10 +20,12 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      <<: *mt_rabbit
-      ASPNETCORE_URLS: http://+:8080
-    # Host'tan çağırmak istersen aç:
-    # ports: ["8082:8080"]
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
     restart: unless-stopped
     networks: [eshop-net]
 
@@ -48,9 +35,12 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      <<: *mt_rabbit
-      ASPNETCORE_URLS: http://+:8080
-    # ports: ["8083:8080"]
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
     restart: unless-stopped
     networks: [eshop-net]
 
@@ -60,20 +50,26 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      <<: *mt_rabbit
-      ASPNETCORE_URLS: http://+:8080
-    # ports: ["8084:8080"]
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
     restart: unless-stopped
     networks: [eshop-net]
 
-  catalog.apii:
+  catalog.apii:          # isim senin istediğin gibi
     image: ${DOCKER_NS:-samt51}/catalog:${VERSION:-latest}
     depends_on:
       rabbitmq:
         condition: service_healthy
     environment:
-      <<: *mt_rabbit
-      ASPNETCORE_URLS: http://+:8080
-    # ports: ["8085:8080"]
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
     restart: unless-stopped
     networks: [eshop-net]

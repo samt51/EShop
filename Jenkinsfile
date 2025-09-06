@@ -5,6 +5,7 @@ pipeline {
     DOCKERHUB_CRED = credentials('dockerhub-cred')   // Jenkins Credentials ID
     GITHUB_PAT     = credentials('github-pat')       // (SCM erişimi için)
     DOCKER_NS      = "samt51"
+    DOCKER_BUILDKIT = "1"
   }
 
   options {
@@ -41,7 +42,8 @@ pipeline {
           set -eu
           SLN=$(find . -maxdepth 3 -name "*.sln" | head -n1)
           echo "Solution: ${SLN}"
-          docker run --rm -v "$PWD":/ws -w /ws -e SLN="${SLN}" mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
+          docker run --rm -e DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+            -v "$PWD":/ws -w /ws -e SLN="${SLN}" mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
             set -euo pipefail
             if [ -n "${SLN:-}" ] && [ -f "${SLN:-}" ]; then
               dotnet restore "${SLN}"
@@ -64,7 +66,8 @@ pipeline {
           if [ -z "${TESTS}" ]; then
             echo "No test projects found - continuing."
           else
-            docker run --rm -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
+            docker run --rm -e DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+              -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
               set -euo pipefail
               for p in $(find . -name "*Test*.csproj"); do
                 dotnet test "$p" -c Release --no-build --logger "trx;LogFileName=$(basename "$p").trx"
@@ -96,14 +99,13 @@ pipeline {
 
     stage('Docker Build & Push') {
       stages {
-
         stage('Build basket') {
           options { timeout(time: 20, unit: 'MINUTES') }
           steps {
             sh '''
               set -eu
               echo ">>> Building image for basket"
-              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+              docker build --pull --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
                 -t "${DOCKER_NS}/basket:${VERSION}" -f EShopSln/Basket.Api/Dockerfile .
               docker tag "${DOCKER_NS}/basket:${VERSION}" "${DOCKER_NS}/basket:latest"
             '''
@@ -129,7 +131,7 @@ pipeline {
             sh '''
               set -eu
               echo ">>> Building image for catalog (Catalog.Apii)"
-              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+              docker build --pull --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
                 -t "${DOCKER_NS}/catalog:${VERSION}" -f EShopSln/Catalog.Apii/Dockerfile .
               docker tag "${DOCKER_NS}/catalog:${VERSION}" "${DOCKER_NS}/catalog:latest"
             '''
@@ -155,7 +157,7 @@ pipeline {
             sh '''
               set -eu
               echo ">>> Building image for order"
-              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+              docker build --pull --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
                 -t "${DOCKER_NS}/order:${VERSION}" -f EShopSln/Order.Api/Dockerfile .
               docker tag "${DOCKER_NS}/order:${VERSION}" "${DOCKER_NS}/order:latest"
             '''
@@ -181,7 +183,7 @@ pipeline {
             sh '''
               set -eu
               echo ">>> Building image for payment"
-              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+              docker build --pull --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
                 -t "${DOCKER_NS}/payment:${VERSION}" -f EShopSln/Payment.Api/Dockerfile .
               docker tag "${DOCKER_NS}/payment:${VERSION}" "${DOCKER_NS}/payment:latest"
             '''
@@ -204,6 +206,7 @@ pipeline {
     }
 
     stage('Deploy (docker-compose)') {
+      when { branch 'main' }   // sadece main deploy olsun; istersen kaldır
       options { timeout(time: 10, unit: 'MINUTES') }
       steps {
         script {
@@ -212,7 +215,6 @@ pipeline {
             error "Compose file not found: ${composeFile}"
           }
         }
-        // Proje adı vererek (eshopci) lokal compose ile çakışmayı önle
         sh '''
           set -eu
           echo "Using compose file: EShopSln/compose.yaml"
@@ -240,6 +242,17 @@ pipeline {
   }
 
   post {
+    failure {
+      // Deploy aşaması patlarsa logları topla (özellikle port çakışmaları için faydalı)
+      script {
+        sh '''
+          set +e
+          export COMPOSE_CMD='docker compose -p eshopci -f EShopSln/compose.yaml'
+          $COMPOSE_CMD ps || true
+          $COMPOSE_CMD logs --no-color --tail=300 || true
+        '''
+      }
+    }
     always { echo 'Pipeline finished.' }
   }
 }
