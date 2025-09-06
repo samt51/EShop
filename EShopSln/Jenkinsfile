@@ -1,11 +1,11 @@
 pipeline {
   agent any
 
-  environment {
-    DOCKERHUB_CRED = credentials('dockerhub')   // Jenkins Credentials ID
-    GITHUB_PAT     = credentials('github-pat')  // Jenkins Credentials ID
-    DOCKER_NS      = "samt51"
-  }
+environment {
+  DOCKERHUB_CRED = credentials('dockerhub-cred')   
+  GITHUB_PAT     = credentials('github-pat')
+  DOCKER_NS      = "samt51"
+}
 
   options {
     timestamps()
@@ -76,16 +76,25 @@ pipeline {
       }
     }
 
-    stage('Docker Login') {
-      steps {
-        retry(2) {
-          sh '''
-            set -eu
-            echo "${DOCKERHUB_CRED_PSW}" | docker login -u "${DOCKERHUB_CRED_USR}" --password-stdin
-          '''
-        }
+stage('Docker Login') {
+  steps {
+    retry(2) {
+      withCredentials([usernamePassword(
+        credentialsId: 'dockerhub-cred',      // Jenkins'teki doğru ID
+        usernameVariable: 'DOCKERHUB_USR',
+        passwordVariable: 'DOCKERHUB_PSW'
+      )]) {
+        sh '''
+          set -eu
+          echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
+          # (opsiyonel) Docker daemon ayakta mı hızlı kontrol
+          docker info >/dev/null 2>&1
+        '''
       }
     }
+  }
+}
+
 
     stage('Docker Build & Push') {
       stages {
