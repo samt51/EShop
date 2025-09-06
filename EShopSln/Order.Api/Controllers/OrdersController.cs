@@ -12,8 +12,7 @@ namespace Order.Api.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IMediator _mediator;
-     
-
+        
         public OrdersController(IMediator mediator)
         {
             _mediator = mediator;
