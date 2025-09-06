@@ -1,14 +1,14 @@
 pipeline {
   agent any
+
   options {
     timestamps()
     timeout(time: 45, unit: 'MINUTES')
     disableResume()
-    skipDefaultCheckout()       // Çift checkout'u engelle
   }
 
   environment {
-    // DOCKERHUB_USR / DOCKERHUB_PSW bu credential'dan gelir
+    // dockerhub-cred = Username + Password/Token (UsernamePassword credentials)
     DOCKERHUB       = credentials('dockerhub-cred')
     DOCKER_BUILDKIT = '1'
   }
@@ -78,7 +78,15 @@ pipeline {
       }
     }
 
-    stage('Docker Build & Push (parallel)') {
+    stage('Docker Login') {
+      steps {
+        retry(2) {
+          sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
+        }
+      }
+    }
+
+    stage('Docker Build & Push') {
       steps {
         script {
           def services = [
@@ -88,47 +96,35 @@ pipeline {
             [name: 'payment', path: 'EShopSln/Payment.Api'],
           ]
 
-          // Docker login bir kez
-          retry(2) {
-            sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
-          }
-
-          // Paralel job haritası
-          def branches = services.collectEntries { svc ->
-            ["${svc.name}": {
-              stage("Build ${svc.name}") {
-                timeout(time: 20, unit: 'MINUTES') {
+          services.each { svc ->
+            stage("Build ${svc.name}") {
+              timeout(time: 20, unit: 'MINUTES') {
+                sh """
+                  set -eu
+                  echo ">>> Building image for ${svc.name}"
+                  docker build \\
+                    --build-arg BUILD_VERSION=${VERSION} \\
+                    --build-arg GIT_SHA=${GIT_SHA} \\
+                    -t ${DOCKER_NS}/${svc.name}:${VERSION} \\
+                    -f ${svc.path}/Dockerfile \\
+                    .
+                  docker tag ${DOCKER_NS}/${svc.name}:${VERSION} ${DOCKER_NS}/${svc.name}:latest
+                """
+              }
+            }
+            stage("Push ${svc.name}") {
+              timeout(time: 10, unit: 'MINUTES') {
+                retry(2) {
                   sh """
                     set -eu
-                    echo ">>> Building image for ${svc.name}"
-                    docker build \\
-                      --build-arg BUILD_VERSION=${VERSION} \\
-                      --build-arg GIT_SHA=${GIT_SHA} \\
-                      -t ${DOCKER_NS}/${svc.name}:${VERSION} \\
-                      -f ${svc.path}/Dockerfile \\
-                      .
-                    docker tag ${DOCKER_NS}/${svc.name}:${VERSION} ${DOCKER_NS}/${svc.name}:latest
+                    echo ">>> Pushing ${svc.name}"
+                    docker push ${DOCKER_NS}/${svc.name}:${VERSION}
+                    docker push ${DOCKER_NS}/${svc.name}:latest
                   """
                 }
               }
-              stage("Push ${svc.name}") {
-                timeout(time: 10, unit: 'MINUTES') {
-                  retry(2) {
-                    sh """
-                      set -eu
-                      echo ">>> Pushing ${svc.name}"
-                      docker push ${DOCKER_NS}/${svc.name}:${VERSION}
-                      docker push ${DOCKER_NS}/${svc.name}:latest
-                    """
-                  }
-                }
-              }
-            }]
+            }
           }
-
-          // failFast'i map içine ekleyip tek argümanla çağır
-          branches.failFast = true
-          parallel branches
         }
       }
       post {
@@ -139,40 +135,30 @@ pipeline {
       }
     }
 
-   stage('Deploy (docker-compose)') {
-  when {
-    expression {
-      fileExists('docker-compose.yml') || fileExists('compose.yaml') || fileExists('EShopSln/compose.yaml')
-    }
-  }
-  steps {
-    timeout(time: 10, unit: 'MINUTES') {
-      script {
-        def composeFile = fileExists('docker-compose.yml') ? 'docker-compose.yml' :
-                          (fileExists('compose.yaml') ? 'compose.yaml' :
-                           (fileExists('EShopSln/compose.yaml') ? 'EShopSln/compose.yaml' : ''))
-
-        sh """
-          set -eu
-          echo "Using compose file: ${composeFile}"
-
-          # Docker Hub'a giriş (pull için şart)
-          echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
-
-          # Versiyon ve namespace'i compose'a aktar
-          export VERSION='${VERSION}'
-          export DOCKER_NS='${DOCKER_NS}'
-
-          # İmajları çek; erişim hatası olursa job düşmesin
-          docker compose -f ${composeFile} pull || true
-
-          docker compose -f ${composeFile} up -d --remove-orphans
-          docker compose -f ${composeFile} ps
-        """
+    stage('Deploy (docker-compose)') {
+      when {
+        expression {
+          fileExists('docker-compose.yml') || fileExists('compose.yaml') || fileExists('EShopSln/compose.yaml')
+        }
+      }
+      steps {
+        timeout(time: 10, unit: 'MINUTES') {
+          script {
+            def composeFile = fileExists('docker-compose.yml') ? 'docker-compose.yml' :
+                              (fileExists('compose.yaml') ? 'compose.yaml' :
+                               (fileExists('EShopSln/compose.yaml') ? 'EShopSln/compose.yaml' : ''))
+            echo "Using compose file: ${composeFile}"
+            sh """
+              set -eu
+              DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${composeFile} pull
+              DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${composeFile} up -d --remove-orphans
+              docker compose -f ${composeFile} ps
+            """
+          }
+        }
       }
     }
   }
-}
 
   post {
     success { echo "Build & Push OK -> ${DOCKER_NS}/*:${VERSION}" }
