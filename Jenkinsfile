@@ -1,164 +1,228 @@
 pipeline {
   agent any
 
-  options {
-    timestamps()
-    timeout(time: 45, unit: 'MINUTES')
-    disableResume()
+  environment {
+    DOCKERHUB_CRED = credentials('dockerhub')      // Jenkins Credentials ID
+    GITHUB_PAT     = credentials('github-pat')      // Jenkins Credentials ID (fetch için)
+    DOCKER_NS      = "samt51"
   }
 
-  environment {
-    // dockerhub-cred = Username + Password/Token (UsernamePassword credentials)
-    DOCKERHUB       = credentials('dockerhub-cred')
-    DOCKER_BUILDKIT = '1'
+  options {
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+    ansiColor('xterm')
+    timeout(time: 45, unit: 'MINUTES')
   }
 
   stages {
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'git config --global --add safe.directory "$PWD" || true'
+        sh '''
+          set -e
+          git config --global --add safe.directory "$WORKSPACE"
+        '''
       }
     }
 
     stage('Version Compute') {
       steps {
         script {
-          env.GIT_SHA   = sh(returnStdout: true, script: 'git rev-parse --short=8 HEAD || echo nosha').trim()
-          env.VERSION   = "${env.BUILD_NUMBER}-${env.GIT_SHA}"
-          env.DOCKER_NS = sh(returnStdout: true, script: 'printf "%s" "$DOCKERHUB_USR"').trim()
+          def shortSha = sh(returnStdout: true, script: 'git rev-parse --short=8 HEAD').trim()
+          env.VERSION = "7-${shortSha}" // örnek: önceki build sayına göre değişebilir
           echo "VERSION=${env.VERSION}  DOCKER_NS=${env.DOCKER_NS}"
         }
       }
     }
 
     stage('Dotnet Restore & Build') {
+      options { timeout(time: 15, unit: 'MINUTES') }
       steps {
-        timeout(time: 15, unit: 'MINUTES') {
-          sh '''
-            set -eu
-            SLN="$(find . -maxdepth 3 -name "*.sln" | head -n1 || true)"
-            echo "Solution: ${SLN}"
-
-            docker run --rm -v "$PWD":/ws -w /ws -e SLN="$SLN" mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
-              set -euo pipefail
-              if [ -n "${SLN:-}" ] && [ -f "${SLN:-}" ]; then
-                dotnet restore "${SLN}"
-                dotnet build   "${SLN}" -c Release --no-restore
-              else
-                find . -name "*.csproj" -print0 | xargs -0 -I{} dotnet restore "{}"
-                find . -name "*.csproj" -print0 | xargs -0 -I{} dotnet build "{}" -c Release --no-restore
-              fi
-            '
-          '''
-        }
+        sh '''
+          set -eu
+          SLN=$(find . -maxdepth 3 -name "*.sln" | head -n1)
+          echo "Solution: ${SLN}"
+          docker run --rm -v "$PWD":/ws -w /ws -e SLN="${SLN}" mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
+            set -euo pipefail
+            if [ -n "${SLN:-}" ] && [ -f "${SLN:-}" ]; then
+              dotnet restore "${SLN}"
+              dotnet build   "${SLN}" -c Release --no-restore
+            else
+              find . -name "*.csproj" -print0 | xargs -0 -I{} dotnet restore "{}"
+              find . -name "*.csproj" -print0 | xargs -0 -I{} dotnet build "{}" -c Release --no-restore
+            fi
+          '
+        '''
       }
     }
 
     stage('Tests') {
+      options { timeout(time: 10, unit: 'MINUTES') }
       steps {
-        timeout(time: 10, unit: 'MINUTES') {
-          sh '''
-            set -eu
-            TESTS="$(find . -name "*Test*.csproj" || true)"
-            if [ -z "$TESTS" ]; then
-              echo "No test projects found - continuing."
-            else
-              docker run --rm -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
-                set -euo pipefail
-                for p in $(find . -name "*Test*.csproj"); do
-                  echo "Running tests in $p"
-                  dotnet test "$p" -c Release --no-build --logger trx || true
-                done
-              '
-            fi
-          '''
-        }
-        junit allowEmptyResults: true, testResults: '**/TestResults/*.trx'
+        sh '''
+          set -eu
+          TESTS=$(find . -name "*Test*.csproj" || true)
+          if [ -z "${TESTS}" ]; then
+            echo "No test projects found - continuing."
+          else
+            docker run --rm -v "$PWD":/ws -w /ws mcr.microsoft.com/dotnet/sdk:8.0 bash -lc '
+              set -euo pipefail
+              for p in $(find . -name "*Test*.csproj"); do
+                dotnet test "$p" -c Release --no-build --logger "trx;LogFileName=$(basename "$p").trx"
+              done
+            '
+          fi
+        '''
+        junit allowEmptyResults: true, testResults: '**/*.trx'
       }
     }
 
     stage('Docker Login') {
       steps {
         retry(2) {
-          sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
+          sh '''
+            set -eu
+            echo "${DOCKERHUB_CRED_PSW}" | docker login -u "${DOCKERHUB_CRED_USR}" --password-stdin
+          '''
         }
       }
     }
 
     stage('Docker Build & Push') {
-      steps {
-        script {
-          def services = [
-            [name: 'basket',  path: 'EShopSln/Basket.Api'],
-            [name: 'catalog', path: 'EShopSln/Catalog.Apii'],
-            [name: 'order',   path: 'EShopSln/Order.Api'],
-            [name: 'payment', path: 'EShopSln/Payment.Api'],
-          ]
-
-          services.each { svc ->
-            stage("Build ${svc.name}") {
-              timeout(time: 20, unit: 'MINUTES') {
-                sh """
-                  set -eu
-                  echo ">>> Building image for ${svc.name}"
-                  docker build \\
-                    --build-arg BUILD_VERSION=${VERSION} \\
-                    --build-arg GIT_SHA=${GIT_SHA} \\
-                    -t ${DOCKER_NS}/${svc.name}:${VERSION} \\
-                    -f ${svc.path}/Dockerfile \\
-                    .
-                  docker tag ${DOCKER_NS}/${svc.name}:${VERSION} ${DOCKER_NS}/${svc.name}:latest
-                """
-              }
+      stages {
+        stage('Build basket') {
+          options { timeout(time: 20, unit: 'MINUTES') }
+          steps {
+            sh '''
+              set -eu
+              echo ">>> Building image for basket"
+              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+                -t "${DOCKER_NS}/basket:${VERSION}" -f EShopSln/Basket.Api/Dockerfile .
+              docker tag "${DOCKER_NS}/basket:${VERSION}" "${DOCKER_NS}/basket:latest"
+            '''
+          }
+        }
+        stage('Push basket') {
+          options { timeout(time: 10, unit: 'MINUTES') }
+          steps {
+            retry(2) {
+              sh '''
+                set -eu
+                echo ">>> Pushing basket"
+                docker push "${DOCKER_NS}/basket:${VERSION}"
+                docker push "${DOCKER_NS}/basket:latest"
+              '''
             }
-            stage("Push ${svc.name}") {
-              timeout(time: 10, unit: 'MINUTES') {
-                retry(2) {
-                  sh """
-                    set -eu
-                    echo ">>> Pushing ${svc.name}"
-                    docker push ${DOCKER_NS}/${svc.name}:${VERSION}
-                    docker push ${DOCKER_NS}/${svc.name}:latest
-                  """
-                }
-              }
+          }
+        }
+
+        stage('Build catalog') {
+          options { timeout(time: 20, unit: 'MINUTES') }
+          steps {
+            sh '''
+              set -eu
+              echo ">>> Building image for catalog"
+              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+                -t "${DOCKER_NS}/catalog:${VERSION}" -f EShopSln/Catalog.Apii/Dockerfile .
+              docker tag "${DOCKER_NS}/catalog:${VERSION}" "${DOCKER_NS}/catalog:latest"
+            '''
+          }
+        }
+        stage('Push catalog') {
+          options { timeout(time: 10, unit: 'MINUTES') }
+          steps {
+            retry(2) {
+              sh '''
+                set -eu
+                echo ">>> Pushing catalog"
+                docker push "${DOCKER_NS}/catalog:${VERSION}"
+                docker push "${DOCKER_NS}/catalog:latest"
+              '''
+            }
+          }
+        }
+
+        stage('Build order') {
+          options { timeout(time: 20, unit: 'MINUTES') }
+          steps {
+            sh '''
+              set -eu
+              echo ">>> Building image for order"
+              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+                -t "${DOCKER_NS}/order:${VERSION}" -f EShopSln/Order.Api/Dockerfile .
+              docker tag "${DOCKER_NS}/order:${VERSION}" "${DOCKER_NS}/order:latest"
+            '''
+          }
+        }
+        stage('Push order') {
+          options { timeout(time: 10, unit: 'MINUTES') }
+          steps {
+            retry(2) {
+              sh '''
+                set -eu
+                echo ">>> Pushing order"
+                docker push "${DOCKER_NS}/order:${VERSION}"
+                docker push "${DOCKER_NS}/order:latest"
+              '''
+            }
+          }
+        }
+
+        stage('Build payment') {
+          options { timeout(time: 20, unit: 'MINUTES') }
+          steps {
+            sh '''
+              set -eu
+              echo ">>> Building image for payment"
+              docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
+                -t "${DOCKER_NS}/payment:${VERSION}" -f EShopSln/Payment.Api/Dockerfile .
+              docker tag "${DOCKER_NS}/payment:${VERSION}" "${DOCKER_NS}/payment:latest"
+            '''
+          }
+        }
+        stage('Push payment') {
+          options { timeout(time: 10, unit: 'MINUTES') }
+          steps {
+            retry(2) {
+              sh '''
+                set -eu
+                echo ">>> Pushing payment"
+                docker push "${DOCKER_NS}/payment:${VERSION}"
+                docker push "${DOCKER_NS}/payment:latest"
+              '''
             }
           }
         }
       }
-      post {
-        always {
-          sh 'docker logout || true'
-          sh 'docker builder prune -af || true'
+    }
+
+    stage('Deploy (docker-compose)') {
+      options { timeout(time: 10, unit: 'MINUTES') }
+      steps {
+        script {
+          def composeFile = 'EShopSln/compose.yaml'
+          if (!fileExists(composeFile)) {
+            error "Compose file not found: ${composeFile}"
+          }
         }
+        sh '''
+          set -eu
+          echo "Using compose file: EShopSln/compose.yaml"
+          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml pull
+          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml up -d --remove-orphans
+        '''
       }
     }
-stage('Deploy (docker-compose)') {
-  timeout(time: 10, unit: 'MINUTES') {
-    script {
-      def compose = 'EShopSln/compose.yaml'
-      echo "Using compose file: ${compose}"
-
-      // 1) Eski projeleri temizle (varsa) – hata verse bile job düşmesin
-      sh """
-        set -eu
-        DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${compose} down -v --remove-orphans || true
-        docker container prune -f || true
-        docker image prune -f || true
-      """
-
-      // 2) Yeni imajları çek
-      sh "DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${compose} pull"
-
-      // 3) Tertemiz şekilde ayağa kaldır
-      sh "DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${compose} up -d --force-recreate"
-    }
-  }
-}
+  } // end stages
 
   post {
-    success { echo "Build & Push OK -> ${DOCKER_NS}/*:${VERSION}" }
-    always  { cleanWs() }
+    always {
+      sh '''
+        set +e
+        docker logout || true
+        docker builder prune -af || true
+      '''
+      cleanWs()
+    }
   }
-}
+} // end pipeline
