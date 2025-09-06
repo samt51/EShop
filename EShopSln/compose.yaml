@@ -20,7 +20,6 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      # MassTransit/RabbitMQ bağlantısı (her iki key seti de destek için)
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: guest
       RABBITMQ_PASSWORD: guest
@@ -45,6 +44,20 @@ services:
 
   basket.api:
     image: ${DOCKER_NS:-samt51}/basket:${VERSION:-latest}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+    restart: unless-stopped
+
+  catalog.apii:
+    image: ${DOCKER_NS:-samt51}/catalog:${VERSION:-latest}
     depends_on:
       rabbitmq:
         condition: service_healthy

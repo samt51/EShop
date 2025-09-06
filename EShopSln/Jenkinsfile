@@ -2,15 +2,14 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_CRED = credentials('dockerhub')      // Jenkins Credentials ID
-    GITHUB_PAT     = credentials('github-pat')      // Jenkins Credentials ID (fetch için)
+    DOCKERHUB_CRED = credentials('dockerhub')   // Jenkins Credentials ID
+    GITHUB_PAT     = credentials('github-pat')  // (checkout için kullanılabilir)
     DOCKER_NS      = "samt51"
   }
 
   options {
     timestamps()
     buildDiscarder(logRotator(numToKeepStr: '20'))
-
     timeout(time: 45, unit: 'MINUTES')
   }
 
@@ -29,7 +28,7 @@ pipeline {
       steps {
         script {
           def shortSha = sh(returnStdout: true, script: 'git rev-parse --short=8 HEAD').trim()
-          env.VERSION = "7-${shortSha}" // örnek: önceki build sayına göre değişebilir
+          env.VERSION = "7-${shortSha}"
           echo "VERSION=${env.VERSION}  DOCKER_NS=${env.DOCKER_NS}"
         }
       }
@@ -121,7 +120,7 @@ pipeline {
           steps {
             sh '''
               set -eu
-              echo ">>> Building image for catalog"
+              echo ">>> Building image for catalog (Catalog.Apii)"
               docker build --build-arg BUILD_VERSION="${VERSION}" --build-arg GIT_SHA="$(git rev-parse --short=8 HEAD)" \
                 -t "${DOCKER_NS}/catalog:${VERSION}" -f EShopSln/Catalog.Apii/Dockerfile .
               docker tag "${DOCKER_NS}/catalog:${VERSION}" "${DOCKER_NS}/catalog:latest"
@@ -210,6 +209,7 @@ pipeline {
           echo "Using compose file: EShopSln/compose.yaml"
           DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml pull
           DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml up -d --remove-orphans
+          DOCKER_NS="${DOCKER_NS}" VERSION="${VERSION}" docker compose -f EShopSln/compose.yaml ps
         '''
       }
     }
@@ -217,12 +217,16 @@ pipeline {
 
   post {
     always {
-      sh '''
-        set +e
-        docker logout || true
-        docker builder prune -af || true
-      '''
-      cleanWs()
+      // Bazı Jenkins kurulumlarında post aşamasında workspace context'i düşebiliyor.
+      // Bu nedenle node içine alıyoruz.
+      node {
+        sh '''
+          set +e
+          docker logout || true
+          docker builder prune -af || true
+        '''
+        cleanWs()
+      }
     }
   }
 } // end pipeline
