@@ -134,31 +134,28 @@ pipeline {
         }
       }
     }
+stage('Deploy (docker-compose)') {
+  timeout(time: 10, unit: 'MINUTES') {
+    script {
+      def compose = 'EShopSln/compose.yaml'
+      echo "Using compose file: ${compose}"
 
-    stage('Deploy (docker-compose)') {
-      when {
-        expression {
-          fileExists('docker-compose.yml') || fileExists('compose.yaml') || fileExists('EShopSln/compose.yaml')
-        }
-      }
-      steps {
-        timeout(time: 10, unit: 'MINUTES') {
-          script {
-            def composeFile = fileExists('docker-compose.yml') ? 'docker-compose.yml' :
-                              (fileExists('compose.yaml') ? 'compose.yaml' :
-                               (fileExists('EShopSln/compose.yaml') ? 'EShopSln/compose.yaml' : ''))
-            echo "Using compose file: ${composeFile}"
-            sh """
-              set -eu
-              DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${composeFile} pull
-              DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${composeFile} up -d --remove-orphans
-              docker compose -f ${composeFile} ps
-            """
-          }
-        }
-      }
+      // 1) Eski projeleri temizle (varsa) – hata verse bile job düşmesin
+      sh """
+        set -eu
+        DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${compose} down -v --remove-orphans || true
+        docker container prune -f || true
+        docker image prune -f || true
+      """
+
+      // 2) Yeni imajları çek
+      sh "DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${compose} pull"
+
+      // 3) Tertemiz şekilde ayağa kaldır
+      sh "DOCKER_NS=${DOCKER_NS} VERSION=${VERSION} docker compose -f ${compose} up -d --force-recreate"
     }
   }
+}
 
   post {
     success { echo "Build & Push OK -> ${DOCKER_NS}/*:${VERSION}" }

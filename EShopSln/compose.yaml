@@ -1,14 +1,18 @@
-﻿services:
+﻿# EShopSln/compose.yaml
+name: eshop
+
+services:
   rabbitmq:
     image: rabbitmq:3.13-management
     container_name: eshop-rabbitmq
     ports:
-      - "15672:15672" # RabbitMQ management UI (guest/guest)
+      - "15672:15672"   # RabbitMQ management UI (guest/guest)
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 5s
       timeout: 3s
       retries: 20
+    restart: unless-stopped
 
   order.api:
     image: ${DOCKER_NS:-samt51}/order:${VERSION:-latest}
@@ -16,13 +20,14 @@
       rabbitmq:
         condition: service_healthy
     environment:
-      # MassTransit/RabbitMQ bağlantısı için olası key’ler
+      # MassTransit/RabbitMQ bağlantısı (her iki key seti de destek için)
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: guest
       RABBITMQ_PASSWORD: guest
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
+    restart: unless-stopped
 
   payment.api:
     image: ${DOCKER_NS:-samt51}/payment:${VERSION:-latest}
@@ -36,6 +41,7 @@
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
+    restart: unless-stopped
 
   basket.api:
     image: ${DOCKER_NS:-samt51}/basket:${VERSION:-latest}
@@ -49,3 +55,4 @@
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
+    restart: unless-stopped
