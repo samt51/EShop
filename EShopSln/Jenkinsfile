@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_CRED = credentials('dockerhub')
-    GITHUB_PAT     = credentials('github-pat')
+    DOCKERHUB_CRED = credentials('dockerhub')   // Jenkins Credentials ID
+    GITHUB_PAT     = credentials('github-pat')  // Jenkins Credentials ID
     DOCKER_NS      = "samt51"
   }
 
@@ -89,6 +89,7 @@ pipeline {
 
     stage('Docker Build & Push') {
       stages {
+
         stage('Build basket') {
           options { timeout(time: 20, unit: 'MINUTES') }
           steps {
@@ -213,24 +214,25 @@ pipeline {
         '''
       }
     }
+
+    // --- Safer: temizlik ayrı bir stage'de, node bağlamı garanti ---
+    stage('Cleanup') {
+      when { expression { true } }
+      steps {
+        sh '''
+          set +e
+          docker logout || true
+          docker builder prune -af || true
+        '''
+        cleanWs(deleteDirs: true, notFailBuild: true)
+      }
+    }
   }
 
+  // Post'u boş/çok hafif tutuyoruz; workspace context sorun çıkarmaz
   post {
     always {
-      // 'node' kullanmadan; declarative agent already provides workspace context
-      script {
-        try {
-          sh '''
-            set +e
-            docker logout || true
-            docker builder prune -af || true
-          '''
-        } catch (e) {
-          echo "Cleanup warning: ${e}"
-        } finally {
-          cleanWs()
-        }
-      }
+      echo 'Pipeline finished.'
     }
   }
 }
