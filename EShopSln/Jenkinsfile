@@ -4,10 +4,11 @@ pipeline {
     timestamps()
     timeout(time: 45, unit: 'MINUTES')
     disableResume()
+    skipDefaultCheckout()       // Çift checkout'u engelle
   }
 
   environment {
-    // DOCKERHUB_USR / DOCKERHUB_PSW bu credentialdan gelecek
+    // DOCKERHUB_USR / DOCKERHUB_PSW bu credential'dan gelir
     DOCKERHUB       = credentials('dockerhub-cred')
     DOCKER_BUILDKIT = '1'
   }
@@ -92,7 +93,7 @@ pipeline {
             sh 'set -eu; echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
           }
 
-          // Paralel branch map'i
+          // Paralel job haritası
           def branches = services.collectEntries { svc ->
             ["${svc.name}": {
               stage("Build ${svc.name}") {
@@ -125,8 +126,8 @@ pipeline {
             }]
           }
 
-          // failFast opsiyonunu map'e ekleyip tek argümanla çağır
-          branches['failFast'] = true
+          // failFast'i map içine ekleyip tek argümanla çağır
+          branches.failFast = true
           parallel branches
         }
       }
@@ -138,30 +139,40 @@ pipeline {
       }
     }
 
-    stage('Deploy (docker-compose)') {
-      when {
-        expression {
-          fileExists('docker-compose.yml') || fileExists('compose.yaml') || fileExists('EShopSln/compose.yaml')
-        }
-      }
-      steps {
-        timeout(time: 10, unit: 'MINUTES') {
-          script {
-            def composeFile = fileExists('docker-compose.yml') ? 'docker-compose.yml' :
-                              (fileExists('compose.yaml') ? 'compose.yaml' :
-                               (fileExists('EShopSln/compose.yaml') ? 'EShopSln/compose.yaml' : ''))
-            sh """
-              set -eu
-              echo "Using compose file: ${composeFile}"
-              docker compose -f ${composeFile} pull
-              docker compose -f ${composeFile} up -d --remove-orphans
-              docker compose -f ${composeFile} ps
-            """
-          }
-        }
+   stage('Deploy (docker-compose)') {
+  when {
+    expression {
+      fileExists('docker-compose.yml') || fileExists('compose.yaml') || fileExists('EShopSln/compose.yaml')
+    }
+  }
+  steps {
+    timeout(time: 10, unit: 'MINUTES') {
+      script {
+        def composeFile = fileExists('docker-compose.yml') ? 'docker-compose.yml' :
+                          (fileExists('compose.yaml') ? 'compose.yaml' :
+                           (fileExists('EShopSln/compose.yaml') ? 'EShopSln/compose.yaml' : ''))
+
+        sh """
+          set -eu
+          echo "Using compose file: ${composeFile}"
+
+          # Docker Hub'a giriş (pull için şart)
+          echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
+
+          # Versiyon ve namespace'i compose'a aktar
+          export VERSION='${VERSION}'
+          export DOCKER_NS='${DOCKER_NS}'
+
+          # İmajları çek; erişim hatası olursa job düşmesin
+          docker compose -f ${composeFile} pull || true
+
+          docker compose -f ${composeFile} up -d --remove-orphans
+          docker compose -f ${composeFile} ps
+        """
       }
     }
   }
+}
 
   post {
     success { echo "Build & Push OK -> ${DOCKER_NS}/*:${VERSION}" }
