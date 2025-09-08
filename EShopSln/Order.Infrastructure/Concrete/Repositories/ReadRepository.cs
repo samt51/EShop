@@ -65,7 +65,7 @@ namespace Order.Infrastructure.Concrete.Repositories;
         /// <param name="enableTracking"></param>
         /// <returns></returns>
         /// <exception cref="NotFoundException"></exception>
-        public async Task<T> GetAsync(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null, bool enableTracking = false)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null, bool enableTracking = false,CancellationToken ct=default)
         {
             IQueryable<T> queryable = Table;
             if (!enableTracking) queryable = queryable.AsNoTracking();
@@ -73,7 +73,7 @@ namespace Order.Infrastructure.Concrete.Repositories;
 
             //queryable.Where(predicate);
 
-            var data = await queryable.FirstOrDefaultAsync(predicate);
+            var data = await queryable.FirstOrDefaultAsync(predicate,ct);
             if (data is null)
             {
                 throw new Exception($"{typeof(T).Name} Is Not Found");

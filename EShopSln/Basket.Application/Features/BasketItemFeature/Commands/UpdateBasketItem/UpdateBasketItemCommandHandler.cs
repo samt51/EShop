@@ -4,7 +4,6 @@ using Basket.Application.Dtos.BasketItemsDtos;
 using Basket.Application.Interfaces.Mapping;
 using Basket.Application.Interfaces.Repositories;
 using EShop.Shared.Dtos.BasesResponses;
-using EShop.Shared.Messages.Events.CheckoutRequested;
 using MassTransit;
 using MediatR;
 
@@ -16,7 +15,7 @@ public class UpdateBasketItemCommandHandler(IBasketRepository repo, IMapper mapp
    
     public async Task<ResponseDto<UpdateBasketItemCommandResponse>> Handle(UpdateBasketItemCommandRequest request, CancellationToken cancellationToken)
     {
-        // satın al tetiklendiğin de 
+      
         var data = new BasketResponseDto { UserId = request.UserId };
         var basket = await repo.GetAsync(request.UserId.ToString(), cancellationToken) ?? new ResponseDto<BasketResponseDto>(){Data = data} ;
         var item = basket.Data.basketItems.FirstOrDefault(i => i.ProductId == request.ProductId);
@@ -37,12 +36,7 @@ public class UpdateBasketItemCommandHandler(IBasketRepository repo, IMapper mapp
         }
 
         var map = mapper.Map<Domain.Entities.Basket, BasketResponseDto>(basket.Data);
-        await publish.Publish<CheckoutRequestedEvent>(new
-        {
-            BuyerId =request.UserId,
-            BasketId = basket.Data.Id,
-            Items = basket.Data.basketItems.Select(i => new { i.ProductId, i.Quantity,i.Price }).ToList()
-        }, cancellationToken);
+        
 
         await repo.UpsertAsync(map, ct: cancellationToken);
         

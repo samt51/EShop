@@ -1,81 +1,74 @@
+using EShop.Shared.Enums;
 using EShop.Shared.Messages.Commands.Payments;
 using EShop.Shared.Messages.Events;
-using EShop.Shared.Messages.Events.CheckoutRequested;
 using MassTransit;
 using Order.Application.Interfaces.UnitOfWorks;
-using ArgumentException = System.ArgumentException;
-using OrderCreatedEvent = EShop.Shared.Messages.Events.OrderCreatedEvent;
 
-namespace Order.Application.Consumers
+namespace Order.Application.Consumers;
+
+public class PaymentAuthorizedConsumer : IConsumer<PaymentAuthorizedEvent>
 {
-    public class PaymentAuthorizedConsumer : IConsumer<PaymentAuthorizedEvent>
+    private readonly IUnitOfWork _uow;
+
+    public PaymentAuthorizedConsumer(IUnitOfWork uow) => _uow = uow;
+
+    public async Task Consume(ConsumeContext<PaymentAuthorizedEvent> context)
     {
-        private readonly IUnitOfWork _unitOfWork;
+        var m = context.Message;
 
-        public PaymentAuthorizedConsumer(IUnitOfWork unitOfWork)
+
+        if (m.OrderId == 0)
+            throw new ArgumentException("Sipariş Nosu eksik");
+        if (m.BuyerId == 0)
+            throw new ArgumentException("Alıcı Bilgisi eskik");
+
+
+        var correlationId = m.CorrelationId != Guid.Empty
+            ? m.CorrelationId
+            : (context.CorrelationId ?? Guid.NewGuid());
+
+        await _uow.OpenTransactionAsync(context.CancellationToken);
+        try
         {
-            _unitOfWork = unitOfWork;
+            var orderRepo = _uow.GetReadRepository<Domain.OrderAggregate.Order>();
+            var order = await orderRepo.GetAsync(x => x.Id == m.OrderId, ct: context.CancellationToken);
+            if (order is null)
+                throw new InvalidOperationException($"Sipariş Bulunamadı: {m.OrderId}");
+
+
+            if (order.Status is OrderStatus.Paid
+                or OrderStatus.Completed)
+            {
+                await _uow.RollBackAsync(context.CancellationToken);
+                return;
+            }
+
+            order.MarkAsPaid(m.OccurredOnUtc);
+
+            await _uow.SaveAsync(context.CancellationToken);
+            await _uow.CommitAsync(context.CancellationToken);
+
+            // bu event ödeme alınan siparişlerin bir sonraki süreç (paketleme veya mail gibi)
+            // servislerde consume edilir.
+            await context.Publish(new OrderPaidEvent(
+                CorrelationId: correlationId,
+                OrderId: order.Id,
+                PaidAtUtc: order.PaidAtUtc ?? m.OccurredOnUtc,
+                BuyerId: order.BuyerId ?? 0,
+                Total: order.GetTotalPrice
+            ), context.CancellationToken);
         }
-
-        public async Task Consume(ConsumeContext<PaymentAuthorizedEvent> context)
+        catch
         {
-            var msg = context.Message;
+            await _uow.RollBackAsync(context.CancellationToken);
 
-            if (string.IsNullOrWhiteSpace(msg.BuyerId) || msg.OrderItems is null || msg.OrderItems.Count == 0)
-                throw new ArgumentException("Invalid order payload");
-
-            await _unitOfWork.OpenTransactionAsync(context.CancellationToken);
-
-            try
+            // Telafi (compensation) — Refund
+            await context.Send<RefundPaymentCommand>(new
             {
-                var address = new Domain.OrderAggregate.Address(
-                    msg.Province, msg.District, msg.Street, msg.ZipCode, msg.Line);
-
-                var order = new Domain.OrderAggregate.Order(
-                    Convert.ToInt32(msg.BuyerId), address);
-
-                foreach (var i in msg.OrderItems)
-                {
-                    if (i.Price <= 0) throw new ArgumentException("Item price must be > 0");
-                    order.AddOrderItem(i.ProductId, i.ProductName, i.Price, i.PictureUrl);
-                }
-
-                await _unitOfWork.GetWriteRepository<Domain.OrderAggregate.Order>()
-                                 .AddAsync(order, context.CancellationToken);
-
-                await _unitOfWork.SaveAsync(context.CancellationToken);
-                await _unitOfWork.CommitAsync(context.CancellationToken);
-             
-
-                await context.Publish<OrderCreatedEvent>(new
-                {
-                    CorrelationId = context.CorrelationId ?? Guid.NewGuid(),
-                    OrderId = order.Id,
-                    BuyerId = order.BuyerId,
-                    Total   = order.GetTotalPrice   // property'in adı sende böyle
-                }, context.CancellationToken);
-
-            }
-            catch (Exception ex)
-            {
-                await _unitOfWork.RollBackAsync(context.CancellationToken);
-
-           
-                await context.Send<RefundPaymentCommand>(new
-                {
-                    CorrelationId = context.CorrelationId ?? Guid.NewGuid(),
-                    PaymentId = msg.PaymentId,   
-                    Reason = "OrderCreationFailed"
-                }, context.CancellationToken);
-                
-                await context.Publish<InventoryReservationReleaseRequestedEvent>(new
-                {
-                    BuyerId = msg.BuyerId,
-                    BasketId=Guid.NewGuid(),
-                }, context.CancellationToken);
-
-                throw; 
-            }
+                CorrelationId = correlationId,
+                PaymentId = m.PaymentId,
+                Reason = "OrderUpdateFailed"
+            }, context.CancellationToken);
         }
     }
 }

@@ -782,6 +782,9 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
+              "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/EShop.Shared.csproj": {
+                "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/EShop.Shared.csproj"
+              },
               "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/Order.Domain.Core.csproj": {
                 "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Order.Domain.Core/Order.Domain.Core.csproj"
               }

@@ -92,6 +92,9 @@
             "projectReferences": {
               "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Application/Payment.Application.csproj": {
                 "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Application/Payment.Application.csproj"
+              },
+              "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/Payment.Persistence.csproj": {
+                "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/Payment.Persistence.csproj"
               }
             }
           }
@@ -126,6 +129,14 @@
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Serilog.Sinks.PostgreSQL": {
+              "target": "Package",
+              "version": "[2.3.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -179,6 +190,9 @@
             "projectReferences": {
               "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/EShop.Shared.csproj": {
                 "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/EShop.Shared.csproj"
+              },
+              "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/Payment.Domain.csproj": {
+                "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/Payment.Domain.csproj"
               }
             }
           }
@@ -206,6 +220,10 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "MassTransit.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "MassTransit.RabbitMQ": {
               "target": "Package",
               "version": "[8.0.0, )"
@@ -221,6 +239,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [
@@ -238,6 +260,133 @@
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
             },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.406/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/Payment.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/Payment.Domain.csproj",
+        "projectName": "Payment.Domain",
+        "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/Payment.Domain.csproj",
+        "packagesPath": "/Users/sametbaglan/.nuget/packages/",
+        "outputPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/sametbaglan/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/EShop.Shared.csproj": {
+                "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/EShop.Shared/EShop.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.406/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/Payment.Persistence.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/Payment.Persistence.csproj",
+        "projectName": "Payment.Persistence",
+        "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/Payment.Persistence.csproj",
+        "packagesPath": "/Users/sametbaglan/.nuget/packages/",
+        "outputPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/sametbaglan/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Application/Payment.Application.csproj": {
+                "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Application/Payment.Application.csproj"
+              },
+              "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/Payment.Domain.csproj": {
+                "projectPath": "/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Domain/Payment.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }

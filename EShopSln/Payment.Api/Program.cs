@@ -1,8 +1,15 @@
 
 
+using System.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
-using Payment.Api.Middleware.Exceptions;
+using NpgsqlTypes;
 using Payment.Application;
+using Payment.Application.Middleware.Exceptions;
+using Payment.Persistence;
+using Serilog;
+using Serilog.Context;
+using Serilog.Sinks.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +21,25 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
+var columns = new Dictionary<string, ColumnWriterBase>
+{
+    ["timestamp"]        = new TimestampColumnWriter(),
+    ["level"]            = new LevelColumnWriter(renderAsText: true, NpgsqlDbType.Varchar),
+    ["message"]          = new RenderedMessageColumnWriter(),
+    ["message_template"] = new MessageTemplateColumnWriter(),
+    ["exception"]        = new ExceptionColumnWriter(),
+    ["properties"]       = new LogEventSerializedColumnWriter(NpgsqlDbType.Jsonb),
+
+
+    ["source_context"]   = new SinglePropertyColumnWriter("SourceContext", PropertyWriteMethod.ToString, NpgsqlDbType.Text),
+    ["trace_id"]         = new SinglePropertyColumnWriter("TraceId",      PropertyWriteMethod.ToString, NpgsqlDbType.Text),
+    ["user_id"]          = new SinglePropertyColumnWriter("UserId",       PropertyWriteMethod.ToString, NpgsqlDbType.Text),
+};
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplication(builder.Configuration);
-builder.Services.AddTransient<ExceptionMiddleware>();
 
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 
@@ -36,17 +57,50 @@ builder.Services.AddSwaggerGen(o =>
 });
 
 
+builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddHealthChecks();
+builder.Services.AddAuthorization();
 
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSerilogRequestLogging(opts =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    opts.EnrichDiagnosticContext = (diag, http) =>
+    {
+        var traceId = Activity.Current?.Id ?? http.TraceIdentifier;
+        diag.Set("TraceId", traceId);
+        var userId = http.User?.FindFirst("Id")?.Value;
+        if (!string.IsNullOrWhiteSpace(userId)) diag.Set("UserId", userId);
+    };
+});
+
+app.MapHealthChecks("/health/live",  new HealthCheckOptions { Predicate = _ => false });
+app.MapHealthChecks("/health/ready");
+
+// Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI(o =>
+{
+    o.SwaggerEndpoint("/swagger/v1/swagger.json", "Payment API v1");
+    o.RoutePrefix = "swagger";
+});
+
+app.Use(async (context, next) =>
+{
+    var claim = context.User?.Identities?.Select(x => x.FindFirst("Id"))?.FirstOrDefault();
+    if (claim is not null)
+    {
+        using (LogContext.PushProperty("UserId", claim.Value))
+            await next();
+    }
+    else
+    {
+        await next();
+    }
+});
 app.ConfigureExceptionHandlingMiddleware();
 app.UseHttpsRedirection();
 app.MapControllers(); 

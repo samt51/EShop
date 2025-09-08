@@ -1,5 +1,4 @@
 using System.Reflection;
-using Catalog.Application.Consumers;
 using Catalog.Application.Middleware.Exceptions;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -19,9 +18,6 @@ namespace Catalog.Application;
             
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<CheckoutRequestedConsumer>();
-                x.AddConsumer<InventoryReservationReleaseRequestedConsumer>();
-
                 x.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host(configuration["RabbitMQUrl"], "/", h =>
