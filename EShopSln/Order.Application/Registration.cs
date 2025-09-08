@@ -17,7 +17,6 @@ namespace Order.Application;
             {
                 x.AddConsumer<PaymentAuthorizedConsumer>(c => c.ConcurrentMessageLimit = 8);
 
-
                 x.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host(configuration["RabbitMQUrl"], "/", h =>
@@ -27,13 +26,15 @@ namespace Order.Application;
                     });
 
                     cfg.UseMessageRetry(r => r.Exponential(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(2)));
-                    cfg.UseInMemoryOutbox(); // EF Outbox yoksa iyi bir güvenlik
+                    cfg.UseInMemoryOutbox(); 
 
                  
                     cfg.ReceiveEndpoint("order-payment-authorized", e =>
                     {
+                        e.PrefetchCount = 16;        
+                        e.ConcurrentMessageLimit = 8;  
+                        e.UseInMemoryOutbox();
                         e.ConfigureConsumer<PaymentAuthorizedConsumer>(ctx);
-                        e.PrefetchCount = 16;
                     });
                 });
 

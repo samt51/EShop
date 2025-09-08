@@ -6,6 +6,7 @@ namespace Payment.Application.Features.PaymentFeature.Commands.ReceivePayment;
 
 public class ReceivePaymentCommandRequest :  IRequest<ResponseDto<ReceivePaymentCommandResponse>>
 {
+    public Guid CorrelationId { get; set; }
     public string CardName { get; set; }
     public string CardNumber { get; set; }
     public string Expiration { get; set; }

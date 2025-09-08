@@ -1254,6 +1254,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
+          "EShop.Shared": "1.0.0",
           "Order.Domain.Core": "1.0.0"
         },
         "compile": {

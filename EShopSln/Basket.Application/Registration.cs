@@ -18,9 +18,7 @@ namespace Basket.Application;
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
             services.AddMassTransit(x =>
             {
-                x.AddConsumer<OrderCreatedConsumer>();
-
-
+                
                 x.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host(configuration["RabbitMQUrl"], "/", h => { h.Username("guest"); h.Password("guest"); });

@@ -1,4 +1,5 @@
 using EShop.Shared.Dtos.BasesResponses;
+using EShop.Shared.Messages.Events;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -23,24 +24,31 @@ public class ReceivePaymentCommandHandler :  BaseHandler, IRequestHandler<Receiv
 
     public async Task<ResponseDto<ReceivePaymentCommandResponse>> Handle(ReceivePaymentCommandRequest request, CancellationToken cancellationToken)
     {
-        var correlationId = Guid.NewGuid();
-
-        await _publish.Publish<EShop.Shared.Messages.Events.PaymentAuthorizedEvent>(new
+        // ödeme başarılı ise 
+        var evt = new PaymentAuthorizedEvent
         {
-            CorrelationId = correlationId,
+            CorrelationId = request.CorrelationId,
+            OrderId = request.Order.OrderId,
             BuyerId = request.Order.BuyerId,
             Province = request.Order.Address.Province,
             District = request.Order.Address.District,
-            Street   = request.Order.Address.Street,
-            Line     = request.Order.Address.Line,
-            ZipCode  = request.Order.Address.ZipCode,
+            Street = request.Order.Address.Street,
+            Line = request.Order.Address.Line,
+            ZipCode = request.Order.Address.ZipCode,
             PaymentId = Guid.NewGuid().ToString(),
-            OrderItems = request.Order.OrderItems.Select(x => new {
-                x.ProductId,
-                x.ProductName,
-                x.Price,
-                x.PictureUrl
-            }).ToList()
+            OrderItems = request.Order.OrderItems.Select(y => new PaymentAuthorizedOrderItem
+            {
+                ProductId = y.ProductId,
+                ProductName = y.ProductName,
+                PictureUrl = y.PictureUrl,
+                Price = y.Price
+            }).ToList(),
+            OccurredOnUtc = DateTime.UtcNow
+        };
+
+        await _publish.Publish(evt, ctx =>
+        {
+            ctx.CorrelationId = request.CorrelationId;
         }, cancellationToken);
         
         return new ResponseDto<ReceivePaymentCommandResponse>().Success();

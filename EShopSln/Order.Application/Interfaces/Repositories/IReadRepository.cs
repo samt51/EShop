@@ -28,7 +28,7 @@ public interface IReadRepository<T> where T : class,new()
     /// <exception cref="NotFoundException"></exception>
     Task<T> GetAsync(Expression<Func<T, bool>> predicate,
         Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
-        bool enableTracking = false);
+        bool enableTracking = false, CancellationToken ct = default);
 
 
     /// <summary>

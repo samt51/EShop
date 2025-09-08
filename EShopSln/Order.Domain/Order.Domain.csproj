@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\EShop.Shared\EShop.Shared.csproj" />
       <ProjectReference Include="..\Order.Domain.Core\Order.Domain.Core.csproj" />
     </ItemGroup>
 
