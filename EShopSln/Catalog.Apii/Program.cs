@@ -4,7 +4,9 @@ using Catalog.Application.Middleware.Exceptions;
 using Catalog.Persistence;
 using Catalog.Persistence.Context;
 using Catalog.Persistence.Extensions;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Context;
@@ -14,6 +16,14 @@ using Serilog.Sinks.PostgreSQL;
 using NpgsqlTypes;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables(); //
+
+Console.WriteLine($"RabbitMq:Host = {builder.Configuration["RabbitMq:Host"]}");
+Console.WriteLine($"RabbitMQ:Host = {builder.Configuration["RabbitMQ:Host"]}");
 
 builder.Services.AddOutputCache(o =>
 {
@@ -27,13 +37,6 @@ if (builder.Environment.IsDevelopment())
     SelfLog.Enable(Console.Error);
     AppDomain.CurrentDomain.ProcessExit += (_, __) => SelfLog.Disable();
 }
-builder.Services.AddOutputCache(o =>
-{
-    o.AddPolicy("Departments", p => p
-        .Expire(TimeSpan.FromMinutes(30))
-        .SetVaryByHeader("Accept-Language")
-        .Tag("departments"));
-});
 
 
 var columns = new Dictionary<string, ColumnWriterBase>
@@ -72,6 +75,14 @@ builder.Host.UseSerilog((ctx, sp, cfg) =>
     }
 });
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables(); 
+
+
+builder.Services
+    .AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" });
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -85,67 +96,75 @@ builder.Services.AddSwaggerGen(o =>
     });
 });
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("GatewayOnly", p => 
+        p.WithOrigins("http://localhost:5187")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 
 
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddHealthChecks();
 builder.Services.AddAuthorization();
+
+
 
 var app = builder.Build();
 
 
-app.UseSwagger();
-app.UseSwaggerUI(o =>
-{
-    o.SwaggerEndpoint("/swagger/v1/swagger.json", "Catalog API v1");
-    o.RoutePrefix = "swagger";
-});
-
-
-await app.MigrateDevAndSeedAsync<AppDbContext>(async (db, sp) =>
-{
-    await HostingExtensions.DevSeeder.SeedAsync(db);
-});
-
-
-app.UseSerilogRequestLogging(opts =>
-{
-    opts.EnrichDiagnosticContext = (diag, http) =>
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
     {
-        var traceId = Activity.Current?.Id ?? http.TraceIdentifier;
-        diag.Set("TraceId", traceId);
-        var userId = http.User?.FindFirst("Id")?.Value;
-        if (!string.IsNullOrWhiteSpace(userId)) diag.Set("UserId", userId);
-    };
-});
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Catalog API v1");
+  
+    });
 
-
-app.MapHealthChecks("/health/live",  new HealthCheckOptions { Predicate = _ => false });
-app.MapHealthChecks("/health/ready");
-
-
-app.ConfigureExceptionHandlingMiddleware();
-
- app.UseHttpsRedirection(); 
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.Use(async (context, next) =>
-{
-    var claim = context.User?.Identities?.Select(x => x.FindFirst("Id"))?.FirstOrDefault();
-    if (claim is not null)
+    await app.MigrateDevAndSeedAsync<AppDbContext>(async (db, sp) =>
     {
-        using (LogContext.PushProperty("UserId", claim.Value))
+        await HostingExtensions.DevSeeder.SeedAsync(db);
+    });
+
+
+    app.UseSerilogRequestLogging(opts =>
+    {
+        opts.EnrichDiagnosticContext = (diag, http) =>
+        {
+            var traceId = Activity.Current?.Id ?? http.TraceIdentifier;
+            diag.Set("TraceId", traceId);
+            var userId = http.User?.FindFirst("Id")?.Value;
+            if (!string.IsNullOrWhiteSpace(userId)) diag.Set("UserId", userId);
+        };
+    });
+
+    app.ConfigureExceptionHandlingMiddleware();
+
+    app.UseHttpsRedirection();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.Use(async (context, next) =>
+    {
+        var claim = context.User?.Identities?.Select(x => x.FindFirst("Id"))?.FirstOrDefault();
+        if (claim is not null)
+        {
+            using (LogContext.PushProperty("UserId", claim.Value))
+                await next();
+        }
+        else
+        {
             await next();
-    }
-    else
-    {
-        await next();
-    }
-});
-app.UseOutputCache();
-app.MapControllers();
-app.Run();
+        }
+    });
+    app.UseCors("GatewayOnly");
+    app.UseOutputCache();
+    app.MapControllers();
+    app.MapGet("/health", () => Results.Text("Healthy")).WithName("Health").WithOpenApi();
+    app.MapHealthChecks("/live",  new HealthCheckOptions { Predicate = r => r.Name == "self" });
+    app.MapHealthChecks("/ready", new HealthCheckOptions { Predicate = _ => true });
+    app.MapHealthChecks("/healthz", new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
+    app.Run("http://0.0.0.0:5018");

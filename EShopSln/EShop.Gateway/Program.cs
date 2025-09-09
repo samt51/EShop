@@ -1,34 +1,40 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Microsoft.OpenApi.Models;
+using MMLib.SwaggerForOcelot;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-
-// Ocelot config dosyası
-var env = builder.Environment;
-builder.Configuration
-    .SetBasePath(env.ContentRootPath)
-    .AddJsonFile("appsettings.json", optional: false)
-    .AddJsonFile($"configuration.{env.EnvironmentName}.json", optional: true);
-
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "EShop Gateway", Version = "v1" });
+});
 
 builder.Services.AddOcelot(builder.Configuration);
+builder.Services.AddSwaggerForOcelot(builder.Configuration);
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Birleşik UI => http://localhost:5187/swagger
+    app.UseSwaggerForOcelotUI(opt =>
+    {
+        opt.PathToSwaggerGenerator = "/swagger/docs";
+        // İstersen: opt.RoutePrefix = "swagger"; // default zaten "swagger"
+    });
+
+    // Gateway’in kendi dokümanı => http://localhost:5187/gateway/swagger
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EShop Gateway v1");
+        c.RoutePrefix = "gateway/swagger";
+    });
+
+    app.UseDeveloperExceptionPage();
 }
-app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseHttpsRedirection();
+
 await app.UseOcelot();
 app.Run();

@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "http": {
+    "Gateway.Development": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
@@ -19,7 +19,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "https": {
+    "Gateway.Production": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

@@ -1,4 +1,5 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/bin/Debug/net8.0/Payment.Persistence.deps.json
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/bin/Debug/net8.0/Payment.Persistence.runtimeconfig.json
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/bin/Debug/net8.0/Payment.Persistence.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/bin/Debug/net8.0/Payment.Persistence.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/bin/Debug/net8.0/EShop.Shared.dll
@@ -17,4 +18,5 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/obj/Debug/net8.0/Payment.Persistence.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/obj/Debug/net8.0/refint/Payment.Persistence.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/obj/Debug/net8.0/Payment.Persistence.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/obj/Debug/net8.0/Payment.Persistence.genruntimeconfig.cache
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Payment.Persistence/obj/Debug/net8.0/ref/Payment.Persistence.dll

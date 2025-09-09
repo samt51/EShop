@@ -1,6 +1,7 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/bin/Debug/net8.0/Catalog.Infrastructure.deps.json
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/bin/Debug/net8.0/Catalog.Infrastructure.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/bin/Debug/net8.0/Catalog.Infrastructure.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/Catalog.Infrastructure.csproj.AssemblyReference.cache
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/Catalog.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/Catalog.Infrastructure.AssemblyInfoInputs.cache
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/Catalog.Infrastructure.AssemblyInfo.cs
@@ -10,4 +11,3 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/refint/Catalog.Infrastructure.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/Catalog.Infrastructure.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/ref/Catalog.Infrastructure.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Infrastructure/obj/Debug/net8.0/Catalog.Infrastructure.csproj.AssemblyReference.cache

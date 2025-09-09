@@ -1,0 +1,5 @@
+
+dotnet list Basket.Api package --include-transitive | grep -i rabbitmq.client
+
+
+

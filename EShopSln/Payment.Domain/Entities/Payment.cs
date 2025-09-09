@@ -17,7 +17,7 @@ public class Payment:BaseEntity
 
     public string? Gateway { get; private set; }
     public string? GatewayPaymentId { get; private set; }
-    public string Reason { get; set; }   
+    public string? Reason { get; set; }   
     
     public Payment() { }
     
@@ -36,6 +36,7 @@ public class Payment:BaseEntity
         Amount = amount;
         Currency = currency;
         Gateway = gateway;
+        Reason = string.Empty;
     }
     
     // Basit domain metotları

@@ -12,7 +12,6 @@
         <ProjectReference Include="..\EShop.Shared\EShop.Shared.csproj" />
     </ItemGroup>
 
-    <!-- ASP.NET Core API'larını (OutputCaching dahil) getirir -->
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
@@ -37,5 +36,4 @@
         <Folder Include="Filter\" />
     </ItemGroup>
 
-    <!-- KALDIRILDI: Elle eklenen OutputCaching.dll Reference/HintPath -->
 </Project>
