@@ -61,8 +61,7 @@ public class PaymentAuthorizedConsumer : IConsumer<PaymentAuthorizedEvent>
         catch
         {
             await _uow.RollBackAsync(context.CancellationToken);
-
-            // Telafi (compensation) — Refund
+            
             await context.Send<RefundPaymentCommand>(new
             {
                 CorrelationId = correlationId,
