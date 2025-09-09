@@ -1,7 +1,9 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Basket.Application.deps.json
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Basket.Application.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Basket.Application.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Basket.Domain.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/EShop.Shared.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Basket.Domain.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/EShop.Shared.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/obj/Debug/net8.0/Basket.Application.csproj.AssemblyReference.cache
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/obj/Debug/net8.0/Basket.Application.GeneratedMSBuildEditorConfig.editorconfig
@@ -14,15 +16,3 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/obj/Debug/net8.0/refint/Basket.Application.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/obj/Debug/net8.0/Basket.Application.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/obj/Debug/net8.0/ref/Basket.Application.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Basket.Domain.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Catalog.Application.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Catalog.Domain.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Basket.Domain.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Catalog.Application.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Catalog.Domain.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Order.Application.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Order.Domain.Core.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Order.Domain.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Order.Application.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Order.Domain.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Application/bin/Debug/net8.0/Order.Domain.Core.pdb

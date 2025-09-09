@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Basket.Persistence")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9156858486f3a3b4b9a873bbc666def3304a187")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+317a81dc59418abd74ecd735eb7a2470048d75f4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Basket.Persistence")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Basket.Persistence")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -4,7 +4,6 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <!-- İstersen bırak: <LangVersion>latest</LangVersion> -->
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,7 +12,6 @@
         <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.0.0" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
         <PackageReference Include="MediatR" Version="13.0.0" />
-        <!-- EF Core kullanmıyorsan bu satırı kaldır -->
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
@@ -24,24 +22,10 @@
         <ProjectReference Include="..\Payment.Domain\Payment.Domain.csproj" />
     </ItemGroup>
 
-    <!-- ÖNEMLİ: ASP.NET Core tipleri için FrameworkReference ekle -->
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <!-- KALDIR: Tekil DLL referansı ve HintPath (Docker'da patlatıyor)
-    <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
-        <HintPath>.../Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-    -->
-
-    <!-- İsteğe bağlı: boş klasör tanımları gereksiz ise kaldırılabilir
-    <ItemGroup>
-      <Folder Include="Features\PaymentFeature\Queries\" />
-      <Folder Include="Features\PaymentFeature\Validator\" />
-    </ItemGroup>
-    -->
+    
 
 </Project>

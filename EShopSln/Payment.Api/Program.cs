@@ -2,13 +2,18 @@
 
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using NpgsqlTypes;
 using Payment.Application;
 using Payment.Application.Middleware.Exceptions;
 using Payment.Persistence;
+using Payment.Persistence.Context;
+using Payment.Persistence.Extensions;
 using Serilog;
 using Serilog.Context;
+using Serilog.Events;
 using Serilog.Sinks.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +25,15 @@ builder.Configuration
     .SetBasePath(env.ContentRootPath)
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+var connStr = builder.Configuration["ConnectionStrings:DefaultConnection"];
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseNpgsql(connStr, npg => npg.MigrationsAssembly("Payment.Persistence")));
 
 var columns = new Dictionary<string, ColumnWriterBase>
 {
@@ -36,35 +50,52 @@ var columns = new Dictionary<string, ColumnWriterBase>
     ["user_id"]          = new SinglePropertyColumnWriter("UserId",       PropertyWriteMethod.ToString, NpgsqlDbType.Text),
 };
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddApplication(builder.Configuration);
+// Serilog host entegrasyonu
+builder.Host.UseSerilog((ctx, sp, cfg) =>
+{
+    cfg.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", ctx.HostingEnvironment.ApplicationName)
+        .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+        .WriteTo.Console();
+
+    var logsCs = ctx.Configuration.GetConnectionString("LogsDb");
+    if (!string.IsNullOrWhiteSpace(logsCs))
+    {
+        cfg.WriteTo.Async(a => a.PostgreSQL(
+            connectionString: logsCs,
+            tableName: "logs",
+            columnOptions: columns,
+            needAutoCreateTable: true
+        ));
+    }
+});
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer(); 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Payment API", Version = "v1" });
+    c.CustomSchemaIds(t => t.FullName);
+});
 
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" });
+builder.Services.AddAuthorization();
+builder.Host.UseSerilog(); 
+
+var app = builder.Build();
 
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(o =>
+
+await app.MigrateDevAndSeedAsync<AppDbContext>(async (db, sp) =>
 {
-    o.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Payment API",
-        Version = "v1",
-        Description = "Payment microservice"
-    });
+    await HostingExtensions.DevSeeder.SeedAsync(db);
 });
 
 
-builder.Services.AddApplication(builder.Configuration);
-builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddHealthChecks();
-builder.Services.AddAuthorization();
-
-
-
-var app = builder.Build();
 
 app.UseSerilogRequestLogging(opts =>
 {
@@ -79,14 +110,9 @@ app.UseSerilogRequestLogging(opts =>
 
 app.MapHealthChecks("/health/live",  new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready");
+app.MapHealthChecks("/health");
 
 // Configure the HTTP request pipeline.
-app.UseSwagger();
-app.UseSwaggerUI(o =>
-{
-    o.SwaggerEndpoint("/swagger/v1/swagger.json", "Payment API v1");
-    o.RoutePrefix = "swagger";
-});
 
 app.Use(async (context, next) =>
 {
@@ -101,7 +127,17 @@ app.Use(async (context, next) =>
         await next();
     }
 });
+app.UseSwagger();                                    
+app.UseSwaggerUI(c =>                                
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payment API v1");
+
+});
+
 app.ConfigureExceptionHandlingMiddleware();
-app.UseHttpsRedirection();
+app.MapHealthChecks("/live",  new() { Predicate = r => r.Tags.Contains("live") });
+app.MapHealthChecks("/ready", new() { Predicate = r => r.Tags.Count == 0 || r.Tags.Contains("ready") });
+app.MapGet("/health", () => Results.Text("Healthy")).WithName("Health").WithOpenApi();
 app.MapControllers(); 
+app.UseSerilogRequestLogging(); 
 app.Run();

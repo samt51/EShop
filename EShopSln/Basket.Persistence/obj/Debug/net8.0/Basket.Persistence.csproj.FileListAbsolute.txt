@@ -18,13 +18,3 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/obj/Debug/net8.0/refint/Basket.Persistence.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/obj/Debug/net8.0/Basket.Persistence.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/obj/Debug/net8.0/ref/Basket.Persistence.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Application.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Domain.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Application.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Catalog.Domain.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Order.Application.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Order.Domain.Core.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Order.Domain.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Order.Application.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Order.Domain.pdb
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Basket.Persistence/bin/Debug/net8.0/Order.Domain.Core.pdb

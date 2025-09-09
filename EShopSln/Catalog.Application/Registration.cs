@@ -18,14 +18,13 @@ namespace Catalog.Application;
             
             services.AddMassTransit(x =>
             {
+                var rabbitHost = configuration["RabbitMQ:Host"] ?? "localhost";
+                var rabbitUser = configuration["RabbitMQ:Username"] ?? "eshop";
+                var rabbitPass = configuration["RabbitMQ:Password"] ?? "eshop";
                 x.UsingRabbitMq((ctx, cfg) =>
                 {
-                    cfg.Host(configuration["RabbitMQUrl"], "/", h =>
-                    {
-                        h.Username("guest");
-                        h.Password("guest");
-                    });
-
+                    var mq = configuration.GetSection("RabbitMq");
+                    cfg.Host(rabbitHost, "/", h => { h.Username(rabbitUser); h.Password(rabbitPass); });
                     cfg.UseMessageRetry(r => r.Exponential(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(2)));
                     cfg.UseInMemoryOutbox(); 
 

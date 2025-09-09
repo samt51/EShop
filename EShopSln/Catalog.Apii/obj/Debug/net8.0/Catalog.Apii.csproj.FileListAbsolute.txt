@@ -6,10 +6,15 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Catalog.Apii.runtimeconfig.json
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Catalog.Apii.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Catalog.Apii.pdb
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/HealthChecks.UI.Client.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/HealthChecks.UI.Core.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/AutoMapper.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Azure.Core.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Azure.Identity.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/FluentValidation.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.Abstractions.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.RabbitMqTransport.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MediatR.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MediatR.Contracts.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
@@ -25,6 +30,8 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.DependencyModel.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.Diagnostics.HealthChecks.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.FileProviders.Abstractions.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.Hosting.Abstractions.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Microsoft.Extensions.Logging.dll
@@ -45,6 +52,7 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Newtonsoft.Json.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Npgsql.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/RabbitMQ.Client.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Serilog.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Serilog.AspNetCore.dll
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/Serilog.Extensions.Hosting.dll
@@ -115,7 +123,3 @@
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/obj/Debug/net8.0/Catalog.Apii.pdb
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/obj/Debug/net8.0/Catalog.Apii.genruntimeconfig.cache
 /Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/obj/Debug/net8.0/ref/Catalog.Apii.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.Abstractions.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/MassTransit.RabbitMqTransport.dll
-/Users/sametbaglan/Documents/Projects/EShop/EShopSln/Catalog.Apii/bin/Debug/net8.0/RabbitMQ.Client.dll

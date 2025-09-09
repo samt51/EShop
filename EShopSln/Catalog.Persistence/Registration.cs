@@ -1,4 +1,3 @@
-using Catalog.Application.Interfaces.Mapping;
 using Catalog.Application.Interfaces.Repositories;
 using Catalog.Application.Interfaces.UnitOfWorks;
 using Catalog.Persistence.Concrete.Repositories;

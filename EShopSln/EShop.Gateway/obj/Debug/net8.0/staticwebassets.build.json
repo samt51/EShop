@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "9LF/TtbOKYjDK/xMBINtaEx+rk+3V1XoAmMU+tNkbBc=",
+  "Source": "EShop.Gateway",
+  "BasePath": "_content/EShop.Gateway",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

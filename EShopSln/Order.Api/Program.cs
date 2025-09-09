@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using NpgsqlTypes;
 using Order.Application;
@@ -16,8 +17,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Order API", Version = "v1" }); // Payment'ta "Payment API"
+    // 500 alan projelerde en çok çakışma buradan geliyor:
+    c.CustomSchemaIds(t => t.FullName); // Aynı isimli tip çakışmalarını önler
+    // Eğer XML yorumlarını ekliyorsan dosya yoksa 500 verir; emin değilsen ekleme.
+    // var xml = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+    // c.IncludeXmlComments(xml, includeControllerXmlComments: true);
+});
 
 var columns = new Dictionary<string, ColumnWriterBase>
 {
@@ -55,16 +64,18 @@ builder.Host.UseSerilog((ctx, sp, cfg) =>
     }
 });
 
+builder.Services.AddTransient<ExceptionMiddleware>();
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(o =>
+builder.Services.AddSwaggerGen(c =>
 {
-    o.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Order API",
-        Version = "v1",
-        Description = "Order microservice"
-    });
+    c.SwaggerDoc("v1", new() { Title = "Order API", Version = "v1" });
+    c.CustomSchemaIds(t => t.FullName);   // <— ÇAKIŞMAYI KESER
+    // Eğer XML comments ekliyorsan dosya yoksa 500 verir; emin değilsen kaldır:
+    // var xml = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+    // c.IncludeXmlComments(xml, true);
 });
 
 var env = builder.Environment;
@@ -78,7 +89,9 @@ builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies()
 
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddHealthChecks();
+
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" });
 builder.Services.AddAuthorization();
 
 
@@ -104,10 +117,17 @@ app.UseSerilogRequestLogging(opts =>
 
 app.MapHealthChecks("/health/live",  new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready");
+app.MapHealthChecks("/health");
+
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order API v1");
+});
+
 
 app.ConfigureExceptionHandlingMiddleware();
-
-app.UseHttpsRedirection(); 
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -124,6 +144,10 @@ app.Use(async (context, next) =>
         await next();
     }
 });
-
+app.MapGet("/health", () => Results.Text("Healthy"))
+    .WithName("Health")
+    .WithOpenApi(); 
+app.MapHealthChecks("/live",  new() { Predicate = r => r.Tags.Contains("live") });
+app.MapHealthChecks("/ready", new() { Predicate = r => r.Tags.Count == 0 || r.Tags.Contains("ready") });
 app.MapControllers();
 app.Run();

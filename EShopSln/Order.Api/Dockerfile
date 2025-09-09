@@ -1,40 +1,37 @@
 ﻿# --- RUNTIME ---
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-# $APP_UID tanımlı olmayınca build kırılmaması için USER satırını yorumladım
+# Healthcheck için curl ekleyelim
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+# Order.Api dışarıya 3434 verecek
+EXPOSE 3434
 
 # --- BUILD ---
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Bağımlı projeleri kopyala
-COPY ["EShopSln/Order.Api/Order.Api.csproj", "Order.Api/"]
-COPY ["EShopSln/Order.Application/Order.Application.csproj", "Order.Application/"]
-COPY ["EShopSln/Order.Domain/Order.Domain.csproj", "Order.Domain/"]
-COPY ["EShopSln/Order.Domain.Core/Order.Domain.Core.csproj", "Order.Domain.Core/"]
-COPY ["EShopSln/Order.Infrastructure/Order.Infrastructure.csproj", "Order.Infrastructure/"]
-COPY ["EShopSln/EShop.Shared/EShop.Shared.csproj", "EShop.Shared/"]
+# Proje dosyalarını KÖK dizine göre kopyala (EShopSln/ öneki YOK)
+COPY ["Order.Api/Order.Api.csproj", "Order.Api/"]
+COPY ["Order.Application/Order.Application.csproj", "Order.Application/"]
+COPY ["Order.Domain/Order.Domain.csproj", "Order.Domain/"]
+COPY ["Order.Domain.Core/Order.Domain.Core.csproj", "Order.Domain.Core/"]
+COPY ["Order.Infrastructure/Order.Infrastructure.csproj", "Order.Infrastructure/"]
+COPY ["EShop.Shared/EShop.Shared.csproj", "EShop.Shared/"]
 
 RUN dotnet restore "Order.Api/Order.Api.csproj"
 
-# Kaynak kodların tamamını kopyala
+# Tüm kaynakları kopyala ve publish et
 COPY . .
-
-# Build et
-WORKDIR /src/EShopSln/Order.Api
-RUN dotnet build "Order.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# --- PUBLISH ---
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src/EShopSln/Order.Api
+WORKDIR /src/Order.Api
 RUN dotnet publish "Order.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # --- FINAL ---
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+# Container içinde 0.0.0.0:3434 dinle
+ENV ASPNETCORE_URLS=http://0.0.0.0:3434
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Order.Api.dll"]

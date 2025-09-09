@@ -1,11 +1,13 @@
-﻿name: eshop
-networks:
-  eshop-net:
+﻿name: eshopsln
 
 services:
   rabbitmq:
     image: rabbitmq:3.13-management
-    # container_name: KULLANMA (CI'da çakışma yapar)
+    ports: ["5672:5672", "15672:15672"]
+    environment:
+      # Artık tüm servisler 'eshop/eshop' ile bağlanacak
+      RABBITMQ_DEFAULT_USER: eshop
+      RABBITMQ_DEFAULT_PASS: eshop
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 5s
@@ -14,62 +16,94 @@ services:
     restart: unless-stopped
     networks: [eshop-net]
 
+  apigw:
+    image: samt51/apigw:latest
+    build:
+      context: .
+      dockerfile: EShop.Gateway/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+    ports: ["8080:8080"]
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      order.api: { condition: service_started }
+      payment.api: { condition: service_started }
+      catalog-api: { condition: service_started }
+      basket.api: { condition: service_started }
+    restart: unless-stopped
+    networks: [eshop-net]
+
   order.api:
-    image: ${DOCKER_NS:-samt51}/order:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Order.Api/Dockerfile
+    image: samt51/order:latest
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:3434
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: eshop   # guest yerine eshop
+      RabbitMQ__Password: eshop
+      RabbitMQ__VirtualHost: /
     depends_on:
       rabbitmq:
         condition: service_healthy
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_USERNAME: guest
-      RABBITMQ_PASSWORD: guest
-      RabbitMQ__Host: rabbitmq
-      RabbitMQ__Username: guest
-      RabbitMQ__Password: guest
-    restart: unless-stopped
-    networks: [eshop-net]
+    ports: [ "3434:3434" ]
+    networks: [ eshop-net ]
 
   payment.api:
-    image: ${DOCKER_NS:-samt51}/payment:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Payment.Api/Dockerfile
+    image: samt51/payment:latest
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:3536
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: eshop
+      RabbitMQ__Password: eshop
+      RabbitMQ__VirtualHost: /
     depends_on:
       rabbitmq:
         condition: service_healthy
+    ports: [ "3536:3536" ]
+    networks: [ eshop-net ]
+
+  catalog-api:
+    build:
+      context: .
+      dockerfile: ./Catalog.Apii/Dockerfile
+    image: samt51/catalog:latest
     environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_USERNAME: guest
-      RABBITMQ_PASSWORD: guest
+      ASPNETCORE_URLS: http://0.0.0.0:5018
       RabbitMQ__Host: rabbitmq
-      RabbitMQ__Username: guest
-      RabbitMQ__Password: guest
-    restart: unless-stopped
-    networks: [eshop-net]
+      RabbitMQ__Username: eshop
+      RabbitMQ__Password: eshop
+      RabbitMQ__VirtualHost: /
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports: [ "5018:5018" ]
+    networks:
+      eshop-net:
+        aliases: [ catalog.apii ]
 
   basket.api:
-    image: ${DOCKER_NS:-samt51}/basket:${VERSION:-latest}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Basket.Api/Dockerfile
+    image: samt51/basket:latest
     environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_USERNAME: guest
-      RABBITMQ_PASSWORD: guest
+      ASPNETCORE_URLS: http://0.0.0.0:5151
+      RabbitMQUrl: rabbitmq
       RabbitMQ__Host: rabbitmq
-      RabbitMQ__Username: guest
-      RabbitMQ__Password: guest
-    restart: unless-stopped
+      RabbitMQ__VirtualHost: /
+      RabbitMQ__Username: eshop
+      RabbitMQ__Password: eshop
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+    ports: ["5151:5151"]
     networks: [eshop-net]
 
-  catalog.apii:          # isim senin istediğin gibi
-    image: ${DOCKER_NS:-samt51}/catalog:${VERSION:-latest}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_USERNAME: guest
-      RABBITMQ_PASSWORD: guest
-      RabbitMQ__Host: rabbitmq
-      RabbitMQ__Username: guest
-      RabbitMQ__Password: guest
-    restart: unless-stopped
-    networks: [eshop-net]
+networks:
+  eshop-net:
+    external: true
+    name: eshopsln_eshop-net
